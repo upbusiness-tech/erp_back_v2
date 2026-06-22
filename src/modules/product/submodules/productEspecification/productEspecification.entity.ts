@@ -4,6 +4,9 @@ import { ProductEntity } from '../../product.entity';
 
 @Entity({ name: 'product_especifications' })
 export class ProductEspecificationEntity extends BaseEntity {
+  @Column({ type: 'boolean', default: true })
+  isStockControlled: boolean;
+
   @Column()
   stockQuantity: number;
 

@@ -35,6 +35,9 @@ export class CompanyEntity extends BaseUidEntity {
   @Column()
   paymentDay: number;
 
+  @Column()
+  paymentLink: string;
+
   @Column({
     type: 'varchar',
     enum: CompanyStatus,

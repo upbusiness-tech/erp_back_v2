@@ -1,10 +1,10 @@
+import { BaseEntity } from 'src/common/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { CashFlowEntity } from '../cashFlow/cashFlow.entity';
 import { CompanyEntity } from '../company/company.entity';
+import { InternCustomerEntity } from '../internCustomer/internCustomer.entity';
 import { UserEntity } from '../user/user.entity';
 import { SaleStatus, SaleType } from './sale.enum';
-import { BaseEntity } from 'src/common/base.entity';
-import { CashFlowEntity } from '../cashFlow/cashFlow.entity';
-import { InternCustomerEntity } from '../internCustomer/internCustomer.entity';
 
 @Entity({ name: 'sales' })
 export class SaleEntity extends BaseEntity {

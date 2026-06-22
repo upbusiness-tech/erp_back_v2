@@ -3,6 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { CompanyEntity } from '../company/company.entity';
 import { ProductUnitOfMeasure } from './product.enum';
 import { ProductCategoryEntity } from './submodules/productCategory/productCategory.entity';
+import { EmployeeEntity } from '../employee/employee.entity';
 
 export type ProductEspecifications = {
   size: string;
@@ -26,17 +27,18 @@ export class ProductEntity extends BaseEntity {
   @Column({ type: 'varchar', enum: ProductUnitOfMeasure })
   unitOfMeasure: ProductUnitOfMeasure;
 
-  @Column({ type: 'boolean', default: true })
-  isStockControlled: boolean;
-
-  @Column()
-  stockQuantity: number;
-
   @Column({ nullable: true })
   supplierName: string;
 
   @Column({ nullable: true })
   productPicture: string;
+
+  @Column()
+  createByUserUid: string;
+
+  @ManyToOne(() => EmployeeEntity)
+  @JoinColumn({ name: 'createByUserUid' })
+  createByUser: EmployeeEntity;
 
   @Column({ type: 'jsonb', default: {} })
   especification: ProductEspecifications;
