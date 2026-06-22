@@ -17,6 +17,7 @@ import { SaleItemModule } from './modules/sale/submodules/saleItem/saleItem.modu
 import { SalePaymentModule } from './modules/sale/submodules/salePayment/salePayment.module';
 import { UserModule } from './modules/user/user.module';
 import { InternCustomerPriceModule } from './modules/internCustomer/submodules/internCustomerPrice/internCustomerPrice.module';
+import { ProductEspecificationModule } from './modules/product/submodules/productEspecification/productEspecification.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { InternCustomerPriceModule } from './modules/internCustomer/submodules/i
     SalePaymentModule,
     InternCustomerModule,
     InternCustomerPriceModule,
+    ProductEspecificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

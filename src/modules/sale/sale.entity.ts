@@ -28,10 +28,10 @@ export class SaleEntity extends BaseEntity {
   internCustomer: InternCustomerEntity;
 
   @Column()
-  soldByUserId: number;
+  soldByUserUid: string;
 
   @ManyToOne(() => UserEntity)
-  @JoinColumn({ name: 'soldByUserId' })
+  @JoinColumn({ name: 'soldByUserUid' })
   soldByUser: UserEntity;
 
   @Column()
@@ -42,9 +42,9 @@ export class SaleEntity extends BaseEntity {
   cashFlow: CashFlowEntity;
 
   @Column()
-  companyId: number;
+  companyUid: string;
 
   @ManyToOne(() => CompanyEntity)
-  @JoinColumn({ name: 'companyId' })
+  @JoinColumn({ name: 'companyUid' })
   company: CompanyEntity;
 }

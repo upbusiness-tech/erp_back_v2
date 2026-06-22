@@ -11,9 +11,9 @@ export class ProductCategoryEntity extends BaseEntity {
   color: string;
 
   @Column()
-  companyId: number;
+  companyUid: string;
 
   @ManyToOne(() => CompanyEntity)
-  @JoinColumn({ name: 'companyId' })
+  @JoinColumn({ name: 'companyUid' })
   company: CompanyEntity;
 }

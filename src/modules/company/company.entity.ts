@@ -1,10 +1,10 @@
-import { BaseEntity } from 'src/common/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { PlanEntity } from '../plan/plan.entity';
 import { CompanyStatus } from './company.enum';
+import { BaseUidEntity } from 'src/common/base.entity';
 
 @Entity({ name: 'companies' })
-export class CompanyEntity extends BaseEntity {
+export class CompanyEntity extends BaseUidEntity {
   @Column({ type: 'varchar' })
   name: string;
 

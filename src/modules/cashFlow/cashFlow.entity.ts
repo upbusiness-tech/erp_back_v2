@@ -30,23 +30,23 @@ export class CashFlowEntity extends BaseEntity {
   informedValues: InformedValue[];
 
   @Column()
-  openedByUserId: number;
+  openedByUserUid: string;
 
   @ManyToOne(() => UserEntity)
-  @JoinColumn({ name: 'openedByUserId' })
+  @JoinColumn({ name: 'openedByUserUid' })
   openedByUser: UserEntity;
 
   @Column({ nullable: true, default: null })
-  closedByUserId: number;
+  closedByUserUid: string;
 
   @ManyToOne(() => UserEntity)
-  @JoinColumn({ name: 'closedByUserId' })
+  @JoinColumn({ name: 'closedByUserUid' })
   closedByUser: UserEntity;
 
   @Column()
-  companyId: number;
+  companyUid: string;
 
   @ManyToOne(() => CompanyEntity)
-  @JoinColumn({ name: 'companyId' })
+  @JoinColumn({ name: 'companyUid' })
   company: CompanyEntity;
 }

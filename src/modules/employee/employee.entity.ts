@@ -1,10 +1,10 @@
-import { BaseEntity } from 'src/common/base.entity';
+import { BaseUidEntity } from 'src/common/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { CompanyEntity } from '../company/company.entity';
 import { EmployeeType } from './employee.enum';
 
 @Entity({ name: 'employees' })
-export class EmployeeEntity extends BaseEntity {
+export class EmployeeEntity extends BaseUidEntity {
   @Column()
   name: string;
 
@@ -15,9 +15,9 @@ export class EmployeeEntity extends BaseEntity {
   isActive: boolean;
 
   @Column()
-  companyId: number;
+  companyUid: string;
 
   @ManyToOne(() => CompanyEntity)
-  @JoinColumn({ name: 'companyId' })
+  @JoinColumn({ name: 'companyUid' })
   company: CompanyEntity;
 }

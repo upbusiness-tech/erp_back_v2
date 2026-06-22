@@ -1,10 +1,10 @@
+import { BaseUidEntity } from 'src/common/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
-import { EmployeeEntity } from '../employee/employee.entity';
-import { BaseEntity } from 'src/common/base.entity';
 import { CompanyEntity } from '../company/company.entity';
+import { EmployeeEntity } from '../employee/employee.entity';
 
 @Entity({ name: 'users' })
-export class UserEntity extends BaseEntity {
+export class UserEntity extends BaseUidEntity {
   @Column()
   username: string;
 
@@ -12,16 +12,16 @@ export class UserEntity extends BaseEntity {
   password: string;
 
   @Column()
-  employeeId: number;
+  employeeUid: string;
 
   @OneToOne(() => EmployeeEntity)
-  @JoinColumn({ name: 'employeeId' })
+  @JoinColumn({ name: 'employeeUid' })
   employee: EmployeeEntity;
 
   @Column()
-  companyId: number;
+  companyUid: string;
 
   @ManyToOne(() => CompanyEntity)
-  @JoinColumn({ name: 'companyId' })
+  @JoinColumn({ name: 'companyUid' })
   company: CompanyEntity;
 }
