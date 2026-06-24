@@ -4,6 +4,15 @@ import { ProductEntity } from '../../product.entity';
 
 @Entity({ name: 'product_especifications' })
 export class ProductEspecificationEntity extends BaseEntity {
+  @Column()
+  code: string;
+
+  @Column({ type: 'decimal' })
+  salePrice: number;
+
+  @Column({ type: 'decimal', nullable: true })
+  costPrice: number;
+
   @Column({ type: 'boolean', default: true })
   isStockControlled: boolean;
 

@@ -15,15 +15,6 @@ export class ProductEntity extends BaseEntity {
   @Column()
   name: string;
 
-  @Column()
-  code: string;
-
-  @Column({ type: 'decimal' })
-  salePrice: number;
-
-  @Column({ type: 'decimal', nullable: true })
-  costPrice: number;
-
   @Column({ type: 'varchar', enum: ProductUnitOfMeasure })
   unitOfMeasure: ProductUnitOfMeasure;
 
