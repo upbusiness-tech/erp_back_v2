@@ -1,10 +1,10 @@
 import { BaseUidEntity } from 'src/common/base.entity';
+import { CompanyEntity } from 'src/modules/company/company.entity';
+import { EmployeeEntity } from 'src/modules/employee/employee.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
-import { CompanyEntity } from '../company/company.entity';
-import { EmployeeEntity } from '../employee/employee.entity';
 
-@Entity({ name: 'users' })
-export class UserEntity extends BaseUidEntity {
+@Entity({ name: 'employee_users' })
+export class EmployeeUserEntity extends BaseUidEntity {
   @Column()
   username: string;
 

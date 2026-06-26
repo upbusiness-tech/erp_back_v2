@@ -3,8 +3,8 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { CashFlowEntity } from '../cashFlow/cashFlow.entity';
 import { CompanyEntity } from '../company/company.entity';
 import { InternCustomerEntity } from '../internCustomer/internCustomer.entity';
-import { UserEntity } from '../user/user.entity';
 import { SaleStatus, SaleType } from './sale.enum';
+import { EmployeeUserEntity } from '../user/submodules/employeeUser/employeeUser.entity';
 
 @Entity({ name: 'sales' })
 export class SaleEntity extends BaseEntity {
@@ -30,9 +30,9 @@ export class SaleEntity extends BaseEntity {
   @Column()
   soldByUserUid: string;
 
-  @ManyToOne(() => UserEntity)
+  @ManyToOne(() => EmployeeUserEntity)
   @JoinColumn({ name: 'soldByUserUid' })
-  soldByUser: UserEntity;
+  soldByUser: EmployeeUserEntity;
 
   @Column()
   cashFlowId: number;

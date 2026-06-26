@@ -1,8 +1,8 @@
 import { BaseEntity } from 'src/common/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { CompanyEntity } from '../company/company.entity';
-import { UserEntity } from '../user/user.entity';
 import { PaymentMethod } from '../sale/submodules/salePayment/salePayment.enum';
+import { EmployeeUserEntity } from '../user/submodules/employeeUser/employeeUser.entity';
 
 export type InformedValue = {
   method: PaymentMethod;
@@ -32,16 +32,16 @@ export class CashFlowEntity extends BaseEntity {
   @Column()
   openedByUserUid: string;
 
-  @ManyToOne(() => UserEntity)
+  @ManyToOne(() => EmployeeUserEntity)
   @JoinColumn({ name: 'openedByUserUid' })
-  openedByUser: UserEntity;
+  openedByUser: EmployeeUserEntity;
 
   @Column({ nullable: true, default: null })
   closedByUserUid: string;
 
-  @ManyToOne(() => UserEntity)
+  @ManyToOne(() => EmployeeUserEntity)
   @JoinColumn({ name: 'closedByUserUid' })
-  closedByUser: UserEntity;
+  closedByUser: EmployeeUserEntity;
 
   @Column()
   companyUid: string;
