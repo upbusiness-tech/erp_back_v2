@@ -8,5 +8,6 @@ import { EmployeeDataUiService } from './domain/employeeDataUi.service';
   imports: [TypeOrmModule.forFeature([EmployeeEntity])],
   controllers: [EmployeeController],
   providers: [EmployeeDataUiService],
+  exports: [EmployeeDataUiService],
 })
 export class EmployeeModule {}

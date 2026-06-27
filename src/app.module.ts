@@ -12,13 +12,17 @@ import { PlanModule } from './modules/plan/plan.module';
 import { ProductModule } from './modules/product/product.module';
 import { SaleModule } from './modules/sale/sale.module';
 import { UserModule } from './modules/user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
     DbModule,
+    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    JwtModule.register({ global: true }),
     CompanyModule,
     PlanModule,
     InvoiceModule,

@@ -1,9 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, Unique } from 'typeorm';
 import { PlanEntity } from '../plan/plan.entity';
 import { CompanyStatus } from './company.enum';
 import { BaseUidEntity } from 'src/common/base.entity';
 
 @Entity({ name: 'companies' })
+@Unique(['email', 'document'])
 export class CompanyEntity extends BaseUidEntity {
   @Column({ type: 'varchar' })
   name: string;
@@ -14,7 +15,7 @@ export class CompanyEntity extends BaseUidEntity {
   @Column({ type: 'varchar' })
   contactEmail: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', unique: true })
   email: string;
 
   @Column({ type: 'varchar' })

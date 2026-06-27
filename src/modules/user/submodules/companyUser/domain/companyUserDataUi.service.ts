@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
 import { TypeOrmCrudService } from '@dataui/crud-typeorm';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CompanyUserEntity } from '../companyUser.entity';

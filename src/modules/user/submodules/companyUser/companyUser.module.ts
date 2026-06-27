@@ -9,5 +9,6 @@ import { CreateCompanyUserService } from './domain/createCompanyUser.service';
   imports: [TypeOrmModule.forFeature([CompanyUserEntity])],
   controllers: [CompanyUserController],
   providers: [CompanyUserDataUiService, CreateCompanyUserService],
+  exports: [CompanyUserDataUiService],
 })
 export class CompanyUserModule {}

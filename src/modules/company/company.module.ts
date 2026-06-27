@@ -8,5 +8,6 @@ import { CompanyNestCrudService } from './domain/companyNestCrud.service';
   imports: [TypeOrmModule.forFeature([CompanyEntity])],
   controllers: [CompanyController],
   providers: [CompanyNestCrudService],
+  exports: [CompanyNestCrudService],
 })
 export class CompanyModule {}
