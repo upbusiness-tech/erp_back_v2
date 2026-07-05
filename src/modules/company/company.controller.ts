@@ -1,9 +1,10 @@
-import { Controller } from '@nestjs/common';
-import { Crud, CrudController } from '@dataui/crud';
+import { Body, Controller, Post } from '@nestjs/common';
+import { Crud, CrudController, Override } from '@dataui/crud';
 import { CompanyEntity } from './company.entity';
 import { CompanyNestCrudService } from './domain/companyNestCrud.service';
 import { CreateCompanyDto } from './dto/createCompany.dto';
 import { uidParams } from 'src/consts/uidParams';
+import { CreateCompanyService } from './domain/createCompany.service';
 
 @Crud({
   model: {
@@ -18,5 +19,14 @@ import { uidParams } from 'src/consts/uidParams';
 })
 @Controller('company')
 export class CompanyController implements CrudController<CompanyEntity> {
-  constructor(public service: CompanyNestCrudService) {}
+  constructor(
+    public service: CompanyNestCrudService,
+    public createCompanyService: CreateCompanyService,
+  ) {}
+
+  @Post()
+  @Override('createOneBase')
+  async createOne(@Body() dto: CreateCompanyDto) {
+    await this.createCompanyService.execute(dto);
+  }
 }

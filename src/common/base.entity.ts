@@ -25,3 +25,23 @@ export class BaseUidEntity extends BaseDateEntity {
   @PrimaryGeneratedColumn('uuid')
   uid: string;
 }
+
+// export class BaseUidEntityWithAuditUser extends BaseUidEntity {
+//   @Column()
+//   createdByUserUid: string;
+
+//   @ManyToOne(() => EmployeeUserEntity)
+//   createdByUser: EmployeeUserEntity;
+
+//   @Column()
+//   updatedByUserUid: string;
+
+//   @ManyToOne(() => EmployeeUserEntity)
+//   updatedByUser?: EmployeeUserEntity;
+
+//   @Column()
+//   deletedByUserUid: string;
+
+//   @ManyToOne(() => EmployeeUserEntity)
+//   deletedByUser?: EmployeeUserEntity;
+// }

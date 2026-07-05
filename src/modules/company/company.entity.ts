@@ -4,7 +4,7 @@ import { CompanyStatus } from './company.enum';
 import { BaseUidEntity } from 'src/common/base.entity';
 
 @Entity({ name: 'companies' })
-@Unique(['email', 'document'])
+@Unique(['document'])
 export class CompanyEntity extends BaseUidEntity {
   @Column({ type: 'varchar' })
   name: string;
@@ -14,9 +14,6 @@ export class CompanyEntity extends BaseUidEntity {
 
   @Column({ type: 'varchar' })
   contactEmail: string;
-
-  @Column({ type: 'varchar', unique: true })
-  email: string;
 
   @Column({ type: 'varchar' })
   phoneNumber: string;

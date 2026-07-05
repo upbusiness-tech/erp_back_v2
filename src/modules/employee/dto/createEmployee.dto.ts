@@ -1,4 +1,10 @@
-import { IsBoolean, IsEnum, IsString, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { EmployeeType } from '../employee.enum';
 
 export class CreateEmployeeDto {
@@ -13,5 +19,10 @@ export class CreateEmployeeDto {
   isActive: boolean;
 
   @IsString()
-  companyUid: string;
+  @IsOptional()
+  username: string | null;
+
+  @IsString()
+  @IsOptional()
+  password: string | null;
 }

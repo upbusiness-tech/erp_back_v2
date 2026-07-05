@@ -1,6 +1,5 @@
 import {
   IsEmail,
-  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -10,7 +9,6 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { CompanyStatus } from '../company.enum';
 
 export class CreateCompanyDto {
   @IsString()
@@ -52,11 +50,17 @@ export class CreateCompanyDto {
   paymentDay: number;
 
   @IsString()
-  paymentLink: string;
-
-  @IsEnum(CompanyStatus)
-  status: CompanyStatus;
+  @IsOptional()
+  paymentLink: string | null;
 
   @IsNumber()
   planId: number;
+
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  managerName: string;
 }
