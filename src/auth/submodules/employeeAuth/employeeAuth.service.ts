@@ -5,27 +5,23 @@ import * as bcrypt from 'bcrypt';
 import { CompanyTokenPayload, EmployeeTokenPayload } from 'src/auth/auth.types';
 import { LoginEmployeeUserDto } from 'src/auth/dto/loginEmployeeUser.dto';
 import { Role } from 'src/common/roles';
-import { CompanyUserDataUiService } from 'src/modules/user/submodules/companyUser/domain/companyUserDataUi.service';
-import { EmployeeUserDataUiService } from 'src/modules/user/submodules/employeeUser/domain/employeeUserDataUi.service';
+import { UserDataUiService } from 'src/modules/user/domain/userDataUi.service';
+import { UserType } from 'src/modules/user/user.enum';
 
 @Injectable()
 export class EmployeeAuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private readonly companyUserDataUiService: CompanyUserDataUiService,
-    private readonly employeeUserDataUiService: EmployeeUserDataUiService,
+    private readonly userDataUiService: UserDataUiService,
   ) {}
 
   async login(dto: LoginEmployeeUserDto, company: CompanyTokenPayload) {
     try {
-      const companyUserFound = await this.companyUserDataUiService.findOneBy({
-        companyUid: company.companyUid,
-      });
-
-      const employee = await this.employeeUserDataUiService.findOneBy({
+      const employee = await this.userDataUiService.findOneBy({
         username: dto.username,
-        companyUid: companyUserFound.companyUid,
+        companyUid: company.companyUid,
+        type: UserType.EMPLOYEE,
       });
 
       if (!employee) throw new Error('Employee not found');

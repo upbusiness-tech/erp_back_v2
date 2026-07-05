@@ -2,15 +2,14 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CompanyUserEntity } from 'src/modules/user/submodules/companyUser/companyUser.entity';
-import { CompanyUserModule } from 'src/modules/user/submodules/companyUser/companyUser.module';
-import { EmployeeUserEntity } from 'src/modules/user/submodules/employeeUser/employeeUser.entity';
-import { EmployeeUserModule } from 'src/modules/user/submodules/employeeUser/employeeUser.module';
+import { UserEntity } from 'src/modules/user/user.entity';
+import { UserModule } from 'src/modules/user/user.module';
 import { EmployeeAuthService } from './employeeAuth.service';
+import { UserDataUiService } from 'src/modules/user/domain/userDataUi.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CompanyUserEntity, EmployeeUserEntity]),
+    TypeOrmModule.forFeature([UserEntity]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -20,10 +19,9 @@ import { EmployeeAuthService } from './employeeAuth.service';
         },
       }),
     }),
-    CompanyUserModule,
-    EmployeeUserModule,
+    UserModule,
   ],
-  providers: [EmployeeAuthService],
+  providers: [EmployeeAuthService, UserDataUiService],
   exports: [EmployeeAuthService],
 })
 export class EmployeeAuthModule {}

@@ -5,14 +5,15 @@ import * as bcrypt from 'bcrypt';
 import { CompanyTokenPayload } from 'src/auth/auth.types';
 import { LoginCompanyUserDto } from 'src/auth/dto/loginCompanyUser.dto';
 import { Role } from 'src/common/roles';
-import { CompanyUserDataUiService } from 'src/modules/user/submodules/companyUser/domain/companyUserDataUi.service';
+import { UserDataUiService } from 'src/modules/user/domain/userDataUi.service';
+import { UserType } from 'src/modules/user/user.enum';
 
 @Injectable()
 export class CompanyAuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private readonly companyUserDataUiService: CompanyUserDataUiService,
+    private readonly companyUserDataUiService: UserDataUiService,
   ) {}
 
   async login(dto: LoginCompanyUserDto) {
@@ -20,6 +21,7 @@ export class CompanyAuthService {
       const companyUser = await this.companyUserDataUiService.findOne({
         where: {
           email: dto.email,
+          type: UserType.COMPANY,
         },
         relations: {
           company: true,

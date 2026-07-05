@@ -9,10 +9,8 @@ import { EmployeeType } from 'src/modules/employee/employee.enum';
 import { CreateInvoiceDto } from 'src/modules/invoice/dto/createInvoice.dto';
 import { InvoiceEntity } from 'src/modules/invoice/invoice.entity';
 import { InvoiceStatus } from 'src/modules/invoice/invoice.enum';
-import { CompanyUserEntity } from 'src/modules/user/submodules/companyUser/companyUser.entity';
-import { CreateCompanyUserDto } from 'src/modules/user/submodules/companyUser/dto/createCompanyUser.dto';
-import { CreateEmployeeUserDto } from 'src/modules/user/submodules/employeeUser/dto/createEmployeeUser.dto';
-import { EmployeeUserEntity } from 'src/modules/user/submodules/employeeUser/employeeUser.entity';
+import { UserEntity } from 'src/modules/user/user.entity';
+import { UserType } from 'src/modules/user/user.enum';
 import { Repository } from 'typeorm';
 import { CompanyEntity } from '../company.entity';
 import { CompanyStatus } from '../company.enum';
@@ -38,16 +36,14 @@ export class CreateCompanyService {
             { ...values, status: CompanyStatus.ACTIVE },
           );
 
-          const companyUserDto: CreateCompanyUserDto = {
+          const companyUserDto: Partial<UserEntity> = {
             companyUid: companySaved.uid,
-            email,
+            email: email,
             password: await this.encryptPassword(password),
+            type: UserType.COMPANY,
           };
 
-          await transactionalEntityManager.save(
-            CompanyUserEntity,
-            companyUserDto,
-          );
+          await transactionalEntityManager.save(UserEntity, companyUserDto);
 
           const firstEmployeeDto: Partial<EmployeeEntity> = {
             companyUid: companySaved.uid,
@@ -66,7 +62,7 @@ export class CreateCompanyService {
           while (usernameGenerated === '') {
             const generated = generateUsername(managerName);
             const searchResult = await transactionalEntityManager.findOne(
-              EmployeeUserEntity,
+              UserEntity,
               {
                 where: {
                   username: generated,
@@ -79,16 +75,15 @@ export class CreateCompanyService {
             }
           }
 
-          const employeeUserDto: CreateEmployeeUserDto = {
+          const employeeUserDto: Partial<UserEntity> = {
             employeeUid: employeeSaved.uid,
             password: await this.encryptPassword('1234'),
             username: usernameGenerated,
+            companyUid: companySaved.uid,
+            type: UserType.EMPLOYEE,
           };
 
-          await transactionalEntityManager.save(EmployeeUserEntity, {
-            ...employeeUserDto,
-            companyUid: companySaved.uid,
-          });
+          await transactionalEntityManager.save(UserEntity, employeeUserDto);
 
           const firstInvoiceDto: CreateInvoiceDto = {
             companyUid: companySaved.uid,

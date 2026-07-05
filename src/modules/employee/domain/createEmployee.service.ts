@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CompanyTokenPayload } from 'src/auth/auth.types';
 import { generateUsername } from 'src/common/username';
 import { encryptPassword, getDefaultPassword } from 'src/consts/bcrypt';
-import { CreateEmployeeUserDto } from 'src/modules/user/submodules/employeeUser/dto/createEmployeeUser.dto';
-import { EmployeeUserEntity } from 'src/modules/user/submodules/employeeUser/employeeUser.entity';
+import { UserEntity } from 'src/modules/user/user.entity';
+import { UserType } from 'src/modules/user/user.enum';
 import { Repository } from 'typeorm';
 import { CreateEmployeeDto } from '../dto/createEmployee.dto';
 import { EmployeeEntity } from '../employee.entity';
-import { CompanyTokenPayload } from 'src/auth/auth.types';
 
 @Injectable()
 export class CreateEmployeeService {
@@ -34,14 +34,11 @@ export class CreateEmployeeService {
       if (!username) {
         while (!usernameToSave) {
           const generated = generateUsername(employeeSaved.name);
-          const searchResult = await transactionManager.findOne(
-            EmployeeUserEntity,
-            {
-              where: {
-                username: generated,
-              },
+          const searchResult = await transactionManager.findOne(UserEntity, {
+            where: {
+              username: generated,
             },
-          );
+          });
 
           if (!searchResult) {
             usernameToSave = generated;
@@ -49,15 +46,17 @@ export class CreateEmployeeService {
         }
       }
 
-      const employeeUserDto: CreateEmployeeUserDto = {
+      const employeeUserDto: Partial<UserEntity> = {
         employeeUid: employeeSaved.uid,
         password: passwordToSave,
         username: usernameToSave,
+        type: UserType.EMPLOYEE,
+        companyUid,
       };
 
       const employeeUserSaved = await transactionManager.save(
-        EmployeeUserEntity,
-        { ...employeeUserDto, companyUid },
+        UserEntity,
+        employeeUserDto,
       );
 
       return {
