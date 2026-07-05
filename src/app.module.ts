@@ -14,6 +14,8 @@ import { SaleModule } from './modules/sale/sale.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { APP_FILTER } from '@nestjs/core';
+import { AllExceptionsFilter } from './exceptions/handler/allExceptions.handler';
 
 @Module({
   imports: [
@@ -34,6 +36,9 @@ import { JwtModule } from '@nestjs/jwt';
     InternCustomerModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: APP_FILTER, useClass: AllExceptionsFilter },
+  ],
 })
 export class AppModule {}

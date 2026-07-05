@@ -1,10 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { CompanyTokenPayload } from 'src/auth/auth.types';
 import { LoginCompanyUserDto } from 'src/auth/dto/loginCompanyUser.dto';
 import { Role } from 'src/common/roles';
+import { ResourceNotFoundException } from 'src/exceptions/notFound.exception';
 import { UserDataUiService } from 'src/modules/user/domain/userDataUi.service';
 import { UserType } from 'src/modules/user/user.enum';
 
@@ -28,7 +34,7 @@ export class CompanyAuthService {
         },
       });
 
-      if (!companyUser) throw new Error('Company not found');
+      if (!companyUser) throw new ResourceNotFoundException('CompanyUser');
 
       const passwordMatch = await bcrypt.compare(
         dto.password,
@@ -51,7 +57,7 @@ export class CompanyAuthService {
       };
     } catch (error: any) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      throw new Error(error);
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
 }

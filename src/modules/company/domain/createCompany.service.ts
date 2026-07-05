@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { getFirstPaymentDate } from 'src/common/date';
@@ -96,7 +96,7 @@ export class CreateCompanyService {
         },
       );
     } catch (error) {
-      throw new BadRequestException(error);
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
 
