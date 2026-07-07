@@ -33,8 +33,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const path = request.url;
     const method = request.method;
 
-    // Cobre HttpException do Nest E as exceptions lançadas pelo @nestjsx/crud
-    // (ele internamente usa NotFoundException, BadRequestException, etc.)
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
       const res = exception.getResponse();
@@ -44,6 +42,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
           : ((res as any).message ?? exception.message);
       const error = typeof res === 'object' ? (res as any).error : undefined;
 
+      this.logger.error({ res });
       return { statusCode: status, timestamp, path, method, message, error };
     }
 
@@ -79,7 +78,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const driverError = (exception as any).driverError;
     const code = driverError?.code;
 
-    // Códigos do Postgres (ajuste se usar MySQL/SQLServer)
     switch (code) {
       case '23505':
         return {

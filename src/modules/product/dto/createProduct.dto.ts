@@ -1,0 +1,76 @@
+import {
+  ArrayMinSize,
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  IsUrl,
+  ValidateNested,
+} from 'class-validator';
+import { ProductUnitOfMeasure } from '../product.enum';
+import { Type } from 'class-transformer';
+
+export class CreateProductDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsEnum(ProductUnitOfMeasure)
+  unitOfMeasure: ProductUnitOfMeasure;
+
+  @IsString()
+  @IsOptional()
+  supplierName: string;
+
+  @IsString()
+  @IsOptional()
+  @IsUrl()
+  productPicture: string;
+
+  @IsNumber()
+  @IsPositive()
+  productCategoryId: number;
+
+  @IsArray()
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => ProductVariant)
+  variants: ProductVariant[];
+}
+
+export class ProductVariant {
+  @IsString()
+  @IsOptional()
+  code: string;
+
+  @IsNumber()
+  @IsPositive()
+  salePrice: number;
+
+  @IsNumber()
+  @IsOptional()
+  costPrice: number;
+
+  @IsBoolean()
+  isStockControlled: boolean;
+
+  @IsNumber()
+  @IsOptional()
+  stockQuantity: number;
+
+  @IsString()
+  @IsOptional()
+  size: string;
+
+  @IsString()
+  @IsOptional()
+  color: string;
+
+  @IsString()
+  @IsOptional()
+  brand: string;
+}

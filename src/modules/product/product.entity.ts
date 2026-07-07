@@ -1,14 +1,9 @@
 import { BaseEntity } from 'src/common/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { CompanyEntity } from '../company/company.entity';
+import { UserEntity } from '../user/user.entity';
 import { ProductUnitOfMeasure } from './product.enum';
 import { ProductCategoryEntity } from './submodules/productCategory/productCategory.entity';
-import { EmployeeEntity } from '../employee/employee.entity';
-
-export type ProductEspecifications = {
-  size: string;
-  color: string;
-};
 
 @Entity({ name: 'products' })
 export class ProductEntity extends BaseEntity {
@@ -27,12 +22,9 @@ export class ProductEntity extends BaseEntity {
   @Column()
   createByUserUid: string;
 
-  @ManyToOne(() => EmployeeEntity)
+  @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'createByUserUid' })
-  createByUser: EmployeeEntity;
-
-  @Column({ type: 'jsonb', default: {} })
-  especification: ProductEspecifications;
+  createByUser: UserEntity;
 
   @Column({ nullable: true })
   productCategoryId: number;
