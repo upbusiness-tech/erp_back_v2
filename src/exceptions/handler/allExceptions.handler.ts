@@ -20,7 +20,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     const errorResponse = this.buildErrorResponse(exception, request);
-    this.logException(exception, request, errorResponse.statusCode);
+    this.logException(
+      exception,
+      request,
+      errorResponse.statusCode,
+      errorResponse.message.toString(),
+    );
 
     response.status(errorResponse.statusCode).json(errorResponse);
   }
@@ -118,12 +123,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
     exception: unknown,
     request: Request,
     statusCode: number,
+    message: string,
   ) {
     const context = `${request.method} ${request.url}`;
     if (statusCode >= 500) {
       this.logger.error(context, (exception as Error)?.stack);
     } else {
-      this.logger.warn(`${context} - ${statusCode}`);
+      this.logger.warn(`${context} - ${statusCode} - ${message}`);
     }
   }
 }

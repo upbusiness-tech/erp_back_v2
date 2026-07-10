@@ -11,11 +11,8 @@ export type InformedValue = {
 
 @Entity({ name: 'cash_flows' })
 export class CashFlowEntity extends BaseEntity {
-  @Column()
-  openedAt: Date;
-
-  @Column({ type: 'boolean', default: true })
-  isOpen: boolean;
+  @Column({ type: 'boolean', default: false })
+  isClosed: boolean;
 
   @Column({ type: 'decimal' })
   initialBalance: number;

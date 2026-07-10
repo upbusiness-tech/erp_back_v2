@@ -7,10 +7,10 @@ import type {
 import { CurrentCompany } from 'src/auth/decorators/currentCompany.decorator';
 import { CurrentEmployee } from 'src/auth/decorators/currentEmployee.decorator';
 import { CreateProductService } from './domain/createProduct.service';
-import { ProductDataUiService } from './domain/productDataUi.service';
 import { CreateProductDto } from './dto/createProduct.dto';
 import { ProductEntity } from './product.entity';
 import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
+import { ProductDataUiService } from './domain/productDataUi.service';
 
 @Crud({
   model: {

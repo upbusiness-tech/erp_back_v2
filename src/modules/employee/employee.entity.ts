@@ -1,7 +1,8 @@
 import { BaseUidEntity } from 'src/common/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { CompanyEntity } from '../company/company.entity';
 import { EmployeeType } from './employee.enum';
+import { UserEntity } from '../user/user.entity';
 
 @Entity({ name: 'employees' })
 export class EmployeeEntity extends BaseUidEntity {
@@ -20,4 +21,7 @@ export class EmployeeEntity extends BaseUidEntity {
   @ManyToOne(() => CompanyEntity)
   @JoinColumn({ name: 'companyUid' })
   company: CompanyEntity;
+
+  @OneToOne(() => UserEntity, (user) => user.employee)
+  user: UserEntity;
 }

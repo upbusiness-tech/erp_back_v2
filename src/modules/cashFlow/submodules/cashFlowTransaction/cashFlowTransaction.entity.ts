@@ -4,6 +4,7 @@ import { CashFlowEntity } from '../../cashFlow.entity';
 import { TransactionOrigin, TransactionType } from './cashFlowTransaction.enum';
 import { SaleEntity } from 'src/modules/sale/sale.entity';
 import { PaymentMethod } from 'src/modules/sale/submodules/salePayment/salePayment.enum';
+import { UserEntity } from 'src/modules/user/user.entity';
 
 @Entity({ name: 'cash_flow_transactions' })
 export class CashFlowTransactionEntity extends BaseEntity {
@@ -25,6 +26,13 @@ export class CashFlowTransactionEntity extends BaseEntity {
   @ManyToOne(() => SaleEntity)
   @JoinColumn({ name: 'saleId' })
   sale: SaleEntity;
+
+  @Column()
+  createdByUserUid: string;
+
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: 'createdByUserUid' })
+  createdByUser: UserEntity;
 
   @Column()
   cashFlowId: number;
