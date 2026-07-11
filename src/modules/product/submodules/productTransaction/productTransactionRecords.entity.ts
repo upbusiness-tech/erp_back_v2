@@ -1,7 +1,8 @@
+import { BaseEntity } from 'src/common/base.entity';
+import { SaleEntity } from 'src/modules/sale/sale.entity';
+import { UserEntity } from 'src/modules/user/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { ProductEspecificationEntity } from '../productEspecification/productEspecification.entity';
-import { UserEntity } from 'src/modules/user/user.entity';
-import { BaseEntity } from 'src/common/base.entity';
 import { ProductTransactionType } from './productTransactionRecords.enum';
 
 @Entity({ name: 'product_transactions_records' })
@@ -11,6 +12,15 @@ export class ProductTransactionRecordsEntity extends BaseEntity {
 
   @Column({ type: 'int' })
   value: number;
+
+  @Column({ nullable: true })
+  saleId: number;
+
+  @ManyToOne(() => SaleEntity)
+  @JoinColumn({
+    name: 'saleId',
+  })
+  sale: SaleEntity;
 
   @Column({ nullable: false })
   productEspecificationId: number;

@@ -5,7 +5,7 @@ export enum SaleStatus {
 }
 
 export enum SaleType {
-  NORMAL = 'Balcão',
-  SERVICE = 'Serviço',
+  NORMAL = 'BALCAO',
+  SERVICE = 'SERVICO',
   PDV = 'PDV',
 }
