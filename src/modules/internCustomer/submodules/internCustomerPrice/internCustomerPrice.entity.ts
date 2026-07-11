@@ -1,10 +1,10 @@
 import { BaseEntity } from 'src/common/base.entity';
-import { ProductEntity } from 'src/modules/product/product.entity';
+import { ProductEspecificationEntity } from 'src/modules/product/submodules/productEspecification/productEspecification.entity';
 import { Column, Entity, JoinColumn, ManyToOne, Unique } from 'typeorm';
 import { InternCustomerEntity } from '../../internCustomer.entity';
 
 @Entity({ name: 'intern_customer_prices' })
-@Unique(['internCustomerId', 'productId'])
+@Unique(['internCustomerId', 'productEspecificationId'])
 export class InternCustomerPriceEntity extends BaseEntity {
   @Column({ type: 'decimal' })
   specialPrice: number;
@@ -17,9 +17,9 @@ export class InternCustomerPriceEntity extends BaseEntity {
   internCustomer: InternCustomerEntity;
 
   @Column()
-  productId: number;
+  productEspecificationId: number;
 
-  @ManyToOne(() => ProductEntity)
-  @JoinColumn({ name: 'productId' })
-  product: ProductEntity;
+  @ManyToOne(() => ProductEspecificationEntity)
+  @JoinColumn({ name: 'productEspecificationId' })
+  productEspecification: ProductEspecificationEntity;
 }
