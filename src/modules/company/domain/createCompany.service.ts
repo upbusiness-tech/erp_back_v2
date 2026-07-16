@@ -15,6 +15,7 @@ import { Repository } from 'typeorm';
 import { CompanyEntity } from '../company.entity';
 import { CompanyStatus } from '../company.enum';
 import { CreateCompanyDto } from '../dto/createCompany.dto';
+import { CompanySettingService } from '../submodules/companySettings/domain/companySetting.service';
 import { CompanyNestCrudService } from './companyNestCrud.service';
 
 @Injectable()
@@ -23,6 +24,7 @@ export class CreateCompanyService {
     public companyDataUiService: CompanyNestCrudService,
     @InjectRepository(CompanyEntity)
     private repo: Repository<CompanyEntity>,
+    private readonly companySettingService: CompanySettingService,
   ) {}
 
   async execute(dto: CreateCompanyDto) {
@@ -91,6 +93,11 @@ export class CreateCompanyService {
             status: InvoiceStatus.PENDING,
             dueDate: getFirstPaymentDate(values.paymentDay),
           };
+
+          // await transactionalEntityManager.save(
+          //   CompanySettingEntity,
+          //   this.companySettingService.buildDefaultSettings(companySaved.uid),
+          // );
 
           await transactionalEntityManager.save(InvoiceEntity, firstInvoiceDto);
         },
