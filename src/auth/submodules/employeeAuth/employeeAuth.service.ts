@@ -24,7 +24,7 @@ export class EmployeeAuthService {
 
   async login(dto: LoginEmployeeUserDto, company: CompanyTokenPayload) {
     try {
-      const employee = await this.userDataUiService.findOne({
+      const employeeUser = await this.userDataUiService.findOne({
         where: {
           username: dto.username,
           companyUid: company.companyUid,
@@ -32,25 +32,27 @@ export class EmployeeAuthService {
         },
         relations: {
           permissions: true,
+          employee: true,
         },
       });
 
-      if (!employee) throw new ResourceNotFoundException('Employee not found');
+      if (!employeeUser)
+        throw new ResourceNotFoundException('Employee not found');
 
       const passwordMatch = await bcrypt.compare(
         dto.password,
-        employee.password,
+        employeeUser.password,
       );
 
       if (!passwordMatch) throw new UnauthorizedException('Wrong password!');
 
-      const permissions = (employee.permissions ?? []).map((p) => p.key);
+      const permissions = (employeeUser.permissions ?? []).map((p) => p.key);
 
       const payload: EmployeeTokenPayload = {
-        uid: employee.uid,
-        username: employee.username,
+        uid: employeeUser.uid,
+        username: employeeUser.username,
         role: Role.EMPLOYEE,
-        companyUid: employee.companyUid,
+        companyUid: employeeUser.companyUid,
         permissions,
       };
 
@@ -60,7 +62,36 @@ export class EmployeeAuthService {
           secret: this.configService.get('JWT_EMPLOYEE_SECRET'),
         }),
         permissions,
+        name: employeeUser.employee.name,
       };
+    } catch (error: any) {
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async getAvaliableEmployeeUsers(company: CompanyTokenPayload) {
+    try {
+      const employeesUsers = await this.userDataUiService.find({
+        where: {
+          companyUid: company.companyUid,
+          type: UserType.EMPLOYEE,
+          employee: {
+            isActive: true,
+          },
+        },
+        relations: {
+          employee: true,
+        },
+        select: {
+          username: true,
+          employee: {
+            name: true,
+            type: true,
+          },
+        },
+      });
+
+      return employeesUsers;
     } catch (error: any) {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }

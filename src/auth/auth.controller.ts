@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
   Post,
@@ -43,6 +44,12 @@ export class AuthController {
     @CurrentCompany() company: CompanyTokenPayload,
   ) {
     return await this.employeeAuthService.login(dto, company);
+  }
+
+  @Get('avaliable-employees')
+  @UseGuards(CompanyAuthGuard)
+  async avaliableEmployees(@CurrentCompany() company: CompanyTokenPayload) {
+    return await this.employeeAuthService.getAvaliableEmployeeUsers(company);
   }
 
   @Post('login/admin')

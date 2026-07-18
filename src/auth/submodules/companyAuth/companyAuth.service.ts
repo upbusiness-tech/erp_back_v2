@@ -59,6 +59,7 @@ export class CompanyAuthService {
           secret: this.configService.get('JWT_COMPANY_SECRET'),
         }),
         permissions,
+        name: companyUser.company.name,
       };
     } catch (error: any) {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);

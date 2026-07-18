@@ -18,7 +18,7 @@ export class CompanyAuthGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const token = this.extractBearer(request.headers.authorization);
+    const token = request.headers['x-company-token'] as string;
 
     if (!token) throw new UnauthorizedException('Company token missed');
 
@@ -85,11 +85,5 @@ export class CompanyAuthGuard implements CanActivate {
       console.error({ error });
       return false;
     }
-  }
-
-  private extractBearer(header?: string): string | null {
-    if (!header) return null;
-    const [type, token] = header.split(' ');
-    return type === 'Bearer' ? token : null;
   }
 }
