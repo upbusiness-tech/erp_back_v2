@@ -24,10 +24,15 @@ export class EmployeeAuthService {
 
   async login(dto: LoginEmployeeUserDto, company: CompanyTokenPayload) {
     try {
-      const employee = await this.userDataUiService.findOneBy({
-        username: dto.username,
-        companyUid: company.companyUid,
-        type: UserType.EMPLOYEE,
+      const employee = await this.userDataUiService.findOne({
+        where: {
+          username: dto.username,
+          companyUid: company.companyUid,
+          type: UserType.EMPLOYEE,
+        },
+        relations: {
+          permissions: true,
+        },
       });
 
       if (!employee) throw new ResourceNotFoundException('Employee not found');
@@ -39,11 +44,14 @@ export class EmployeeAuthService {
 
       if (!passwordMatch) throw new UnauthorizedException('Wrong password!');
 
+      const permissions = (employee.permissions ?? []).map((p) => p.key);
+
       const payload: EmployeeTokenPayload = {
         uid: employee.uid,
         username: employee.username,
         role: Role.EMPLOYEE,
         companyUid: employee.companyUid,
+        permissions,
       };
 
       return {
@@ -51,9 +59,9 @@ export class EmployeeAuthService {
           expiresIn: '8h',
           secret: this.configService.get('JWT_EMPLOYEE_SECRET'),
         }),
+        permissions,
       };
     } catch (error: any) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }

@@ -7,6 +7,8 @@ import type {
 import { CurrentCompany } from 'src/auth/decorators/currentCompany.decorator';
 import { CurrentEmployee } from 'src/auth/decorators/currentEmployee.decorator';
 import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { RequirePermission } from 'src/common/decorators/require-permission.decorator';
 import { CreateSaleService } from './domain/createSale.service';
 import { SaleDataUiService } from './domain/saleDataUi.service';
 import { CreateSaleDto } from './dto/createSale.dto';
@@ -28,7 +30,7 @@ import { SaleEntity } from './sale.entity';
   }),
 })
 @Controller('sale')
-@UseGuards(EmployeeAuthGuard)
+@UseGuards(EmployeeAuthGuard, PermissionsGuard)
 export class SaleController implements CrudController<SaleEntity> {
   constructor(
     public service: SaleDataUiService,
@@ -37,6 +39,7 @@ export class SaleController implements CrudController<SaleEntity> {
 
   @Override('createOneBase')
   @Post()
+  @RequirePermission('sale_create')
   async createOne(
     @Body() dto: CreateSaleDto,
     @CurrentCompany() company: CompanyTokenPayload,

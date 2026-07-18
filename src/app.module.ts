@@ -12,6 +12,7 @@ import { PlanModule } from './modules/plan/plan.module';
 import { ProductModule } from './modules/product/product.module';
 import { SaleModule } from './modules/sale/sale.module';
 import { UserModule } from './modules/user/user.module';
+import { PermissionModule } from './modules/permission/permission.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_FILTER } from '@nestjs/core';
@@ -21,6 +22,7 @@ import { AllExceptionsFilter } from './exceptions/handler/allExceptions.handler'
   imports: [
     DbModule,
     AuthModule,
+    PermissionModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

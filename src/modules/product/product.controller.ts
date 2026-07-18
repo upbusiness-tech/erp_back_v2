@@ -6,11 +6,14 @@ import type {
 } from 'src/auth/auth.types';
 import { CurrentCompany } from 'src/auth/decorators/currentCompany.decorator';
 import { CurrentEmployee } from 'src/auth/decorators/currentEmployee.decorator';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { RequirePermission } from 'src/common/decorators/require-permission.decorator';
 import { CreateProductService } from './domain/createProduct.service';
 import { CreateProductDto } from './dto/createProduct.dto';
 import { ProductEntity } from './product.entity';
 import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
 import { ProductDataUiService } from './domain/productDataUi.service';
+import { PermissionsRef } from '../permission/const/permissions.ref';
 
 @Crud({
   model: {
@@ -21,7 +24,7 @@ import { ProductDataUiService } from './domain/productDataUi.service';
   },
 })
 @Controller('product')
-@UseGuards(EmployeeAuthGuard)
+@UseGuards(EmployeeAuthGuard, PermissionsGuard)
 export class ProductController implements CrudController<ProductEntity> {
   constructor(
     public service: ProductDataUiService,
@@ -30,6 +33,7 @@ export class ProductController implements CrudController<ProductEntity> {
 
   @Post()
   @Override('createOneBase')
+  @RequirePermission(PermissionsRef.Product.Create.name)
   async createOne(
     @Body() dto: CreateProductDto,
     @CurrentCompany() company: CompanyTokenPayload,

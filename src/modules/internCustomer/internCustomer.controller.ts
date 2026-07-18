@@ -1,6 +1,7 @@
 import { Crud, CrudAuth, CrudController } from '@dataui/crud';
 import { Controller, UseGuards } from '@nestjs/common';
 import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 import { InternCustomerDataUiService } from './domain/internCustomerDataUi.service';
 import { CreateInternCustomerDto } from './dto/createInternCustomer.dto';
 import { InternCustomerEntity } from './internCustomer.entity';
@@ -20,7 +21,7 @@ import { UpdateInternCustomerPriceDto } from './submodules/internCustomerPrice/d
   persist: (req) => ({ companyUid: req.company.companyUid }),
 })
 @Controller('intern-customer')
-@UseGuards(EmployeeAuthGuard)
+@UseGuards(EmployeeAuthGuard, PermissionsGuard)
 export class InternCustomerController implements CrudController<InternCustomerEntity> {
   constructor(public service: InternCustomerDataUiService) {}
 }

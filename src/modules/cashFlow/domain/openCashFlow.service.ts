@@ -4,9 +4,7 @@ import { BusinessException } from 'src/exceptions/business.exception';
 import { InvalidOperationException } from 'src/exceptions/invalidOperation.exception';
 import { ResourceNotFoundException } from 'src/exceptions/notFound.exception';
 import { CompanyNestCrudService } from 'src/modules/company/domain/companyNestCrud.service';
-import { EmployeeType } from 'src/modules/employee/employee.enum';
 import { UserDataUiService } from 'src/modules/user/domain/userDataUi.service';
-import { UserEntity } from 'src/modules/user/user.entity';
 import { Repository } from 'typeorm';
 import { CashFlowEntity } from '../cashFlow.entity';
 import { OpenCashFlowDto } from '../dto/openCashFlowEntity.dto';
@@ -59,9 +57,9 @@ export class OpenCashFlowService {
           'Já existe um caixa aberto para essa empresa!',
         );
 
-      if (!this.canThisEmployeeUserOpenCashFlow(employeeUserFound))
+      if (!employeeUserFound.employee.isActive)
         throw new InvalidOperationException(
-          'Usuário não autorizado para abrir o caixa',
+          'Funcionário inativo não pode abrir o caixa',
         );
 
       const createCashFlowEntity: Partial<CashFlowEntity> = {
@@ -76,11 +74,5 @@ export class OpenCashFlowService {
     }
   }
 
-  // FIXME: será necessário substituir essa lógica para algo mais voltado para permissionamento do funcionário, apesar de que será necessário controlar se o usuário tá ativo ou não
-  private canThisEmployeeUserOpenCashFlow(employeeUser: UserEntity) {
-    return (
-      employeeUser.employee.isActive &&
-      employeeUser.employee.type !== EmployeeType.WAITER
-    );
-  }
+
 }

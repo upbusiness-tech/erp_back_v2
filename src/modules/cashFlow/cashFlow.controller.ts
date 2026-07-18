@@ -7,12 +7,15 @@ import type {
 import { CurrentCompany } from 'src/auth/decorators/currentCompany.decorator';
 import { CurrentEmployee } from 'src/auth/decorators/currentEmployee.decorator';
 import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { RequirePermission } from 'src/common/decorators/require-permission.decorator';
 import { CashFlowEntity } from './cashFlow.entity';
 import { CashFlowDataUiService } from './domain/cashFlowDataUi.service';
 import { OpenCashFlowService } from './domain/openCashFlow.service';
 import { OpenCashFlowDto } from './dto/openCashFlowEntity.dto';
 import { CloseCashFlowDto } from './dto/closeCashFlowEntity.dto';
 import { CloseCashFlowService } from './domain/closeCashFlow.service';
+import { PermissionsRef } from '../permission/const/permissions.ref';
 
 @Crud({
   model: {
@@ -26,7 +29,7 @@ import { CloseCashFlowService } from './domain/closeCashFlow.service';
   },
 })
 @Controller('cash-flow')
-@UseGuards(EmployeeAuthGuard)
+@UseGuards(EmployeeAuthGuard, PermissionsGuard)
 export class CashFlowController implements CrudController<CashFlowEntity> {
   constructor(
     public service: CashFlowDataUiService,
@@ -35,6 +38,7 @@ export class CashFlowController implements CrudController<CashFlowEntity> {
   ) {}
 
   @Post('open')
+  @RequirePermission(PermissionsRef.CashFlow.Open.name)
   async openOne(
     @Body() dto: OpenCashFlowDto,
     @CurrentCompany() company: CompanyTokenPayload,
@@ -48,6 +52,7 @@ export class CashFlowController implements CrudController<CashFlowEntity> {
   }
 
   @Post('close/:cashFlowId')
+  @RequirePermission(PermissionsRef.CashFlow.Close.name)
   async closeOne(
     @Body() dto: CloseCashFlowDto,
     @CurrentCompany() company: CompanyTokenPayload,

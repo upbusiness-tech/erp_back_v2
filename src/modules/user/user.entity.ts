@@ -1,8 +1,17 @@
 import { BaseUidEntity } from 'src/common/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToOne,
+} from 'typeorm';
 import { UserType } from './user.enum';
 import { CompanyEntity } from '../company/company.entity';
 import { EmployeeEntity } from '../employee/employee.entity';
+import { PermissionEntity } from '../permission/permission.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseUidEntity {
@@ -34,4 +43,18 @@ export class UserEntity extends BaseUidEntity {
     name: 'employeeUid',
   })
   employee: EmployeeEntity;
+
+  @ManyToMany(() => PermissionEntity, (permission) => permission.users)
+  @JoinTable({
+    name: 'user_permissions',
+    joinColumn: {
+      name: 'user_uid',
+      referencedColumnName: 'uid',
+    },
+    inverseJoinColumn: {
+      name: 'permission_id',
+      referencedColumnName: 'id',
+    },
+  })
+  permissions: PermissionEntity[];
 }
