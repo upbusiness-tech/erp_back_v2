@@ -16,6 +16,9 @@ export class PermissionEntity extends BaseEntity {
   @Column({ nullable: false })
   description: string;
 
+  @Column({ type: 'boolean', default: true })
+  isAdminPermission: boolean;
+
   @ManyToMany(() => UserEntity, (user) => user.permissions)
   users: UserEntity[];
 }

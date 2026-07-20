@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsBoolean,
   IsEnum,
   IsOptional,
@@ -25,4 +26,8 @@ export class CreateEmployeeDto {
   @IsString()
   @IsOptional()
   password: string | null;
+
+  @IsArray()
+  @IsOptional()
+  permissions: number[];
 }

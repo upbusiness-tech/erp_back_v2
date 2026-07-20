@@ -57,7 +57,7 @@ export class EmployeeAuthService {
       };
 
       return {
-        employeeAccessToken: this.jwtService.sign(payload, {
+        accessToken: this.jwtService.sign(payload, {
           expiresIn: '8h',
           secret: this.configService.get('JWT_EMPLOYEE_SECRET'),
         }),

@@ -5,9 +5,11 @@ import { generateUsername } from 'src/common/username';
 import { encryptPassword, getDefaultPassword } from 'src/consts/bcrypt';
 import { UserEntity } from 'src/modules/user/user.entity';
 import { UserType } from 'src/modules/user/user.enum';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateEmployeeDto } from '../dto/createEmployee.dto';
 import { EmployeeEntity } from '../employee.entity';
+import { PermissionEntity } from 'src/modules/permission/permission.entity';
+import { EmployeeDefaultPermissions } from 'src/modules/permission/const/employee-default-permissions.ref';
 
 @Injectable()
 export class CreateEmployeeService {
@@ -18,16 +20,17 @@ export class CreateEmployeeService {
 
   async execute(dto: CreateEmployeeDto, currentCompany: CompanyTokenPayload) {
     await this.repo.manager.transaction(async (transactionManager) => {
-      const { password, username, ...employeeValues } = dto;
+      const { password, permissions, username, ...employeeValues } = dto;
       const companyUid = currentCompany.companyUid;
       const employeeSaved = await transactionManager.save(EmployeeEntity, {
         ...employeeValues,
         companyUid,
       });
 
-      const passwordToSave = password
-        ? await encryptPassword(password)
-        : await getDefaultPassword();
+      const passwordToSave =
+        password && password !== ''
+          ? await encryptPassword(password)
+          : await getDefaultPassword();
 
       let usernameToSave = username;
 
@@ -46,11 +49,30 @@ export class CreateEmployeeService {
         }
       }
 
+      let foundPermissions;
+      if (permissions) {
+        foundPermissions = await transactionManager.find(PermissionEntity, {
+          where: {
+            id: In(permissions),
+            isAdminPermission: false,
+          },
+        });
+      } else {
+        const defaultPermissions = EmployeeDefaultPermissions[dto.type];
+        foundPermissions = await transactionManager.find(PermissionEntity, {
+          where: {
+            key: In(defaultPermissions),
+            isAdminPermission: false,
+          },
+        });
+      }
+
       const employeeUserDto: Partial<UserEntity> = {
         employeeUid: employeeSaved.uid,
         password: passwordToSave,
         username: usernameToSave,
         type: UserType.EMPLOYEE,
+        permissions: foundPermissions,
         companyUid,
       };
 

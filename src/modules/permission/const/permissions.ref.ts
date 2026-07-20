@@ -6,6 +6,7 @@ import { InternCustomerPermissions } from './keys/internCustomer.permission';
 import { ProductPermissions } from './keys/product.permission';
 import { ReportPermissions } from './keys/report.permission';
 import { SalePermissions } from './keys/sale.permission';
+import { SideBarPermissions } from './keys/sidebar.permission';
 
 export const PermissionsRef = {
   Company: CompanyPermissions,
@@ -15,5 +16,6 @@ export const PermissionsRef = {
   CashFlow: CashFlowPermissions,
   InternCustomer: InternCustomerPermissions,
   Report: ReportPermissions,
+  SideBar: SideBarPermissions,
   Admin: AdminPermissions,
 };

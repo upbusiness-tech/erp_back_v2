@@ -52,6 +52,7 @@ export class CreateCompanyService {
             isActive: true,
             name: managerName,
             type: EmployeeType.MANAGER,
+            isPrimaryEmployee: true,
           };
 
           const employeeSaved = await transactionalEntityManager.save(

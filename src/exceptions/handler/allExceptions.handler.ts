@@ -62,6 +62,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     if (exception instanceof QueryFailedError) {
+      this.logger.error(exception);
       return this.handleQueryFailedError(exception, timestamp, path, method);
     }
 

@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { EmployeeType } from 'src/modules/employee/employee.enum';
 import { UserEntity } from 'src/modules/user/user.entity';
 import { In, Repository } from 'typeorm';
+import { EmployeeDefaultPermissions } from '../const/employee-default-permissions.ref';
 import { PermissionsRef } from '../const/permissions.ref';
 import { PermissionEntity } from '../permission.entity';
 
@@ -14,7 +16,7 @@ export class PermissionService {
     private readonly userRepo: Repository<UserEntity>,
   ) {}
 
-  private async syncPermissions() {
+  public async syncPermissions() {
     const permissions: Partial<PermissionEntity>[] = [];
 
     for (const [moduleName, modulePermissions] of Object.entries(
@@ -26,6 +28,7 @@ export class PermissionService {
           key: permission.name,
           title: permission.displayName,
           description: permission.description,
+          isAdminPermission: permission.isAdminPermission,
         });
       }
     }
@@ -60,5 +63,60 @@ export class PermissionService {
     });
 
     return permissions;
+  }
+
+  async findEmployeeDefaultPermissions(employeeType: EmployeeType) {
+    const avaliablePermissions = await this.repo.find({
+      where: {
+        key: In(EmployeeDefaultPermissions.Gerente),
+        isAdminPermission: false,
+      },
+      select: {
+        id: true,
+        description: true,
+        title: true,
+        module: true,
+      },
+    });
+
+    let employeeTypeDefaultPermissions;
+
+    switch (employeeType) {
+      case EmployeeType.CASHIER:
+        employeeTypeDefaultPermissions = await this.repo.find({
+          where: {
+            key: In(EmployeeDefaultPermissions.Caixa),
+            isAdminPermission: false,
+          },
+          select: {
+            id: true,
+            description: true,
+            title: true,
+            module: true,
+          },
+        });
+        break;
+      case EmployeeType.WAITER:
+        employeeTypeDefaultPermissions = await this.repo.find({
+          where: {
+            key: In(EmployeeDefaultPermissions.Garçom),
+            isAdminPermission: false,
+          },
+          select: {
+            id: true,
+            description: true,
+            title: true,
+          },
+        });
+        break;
+      case EmployeeType.MANAGER:
+        employeeTypeDefaultPermissions = avaliablePermissions;
+        break;
+    }
+
+    return {
+      employeeTypeDefaultPermissions,
+      allAvaliablePermission: avaliablePermissions,
+    };
   }
 }
