@@ -1,9 +1,10 @@
 import { BaseEntity } from 'src/common/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CompanyEntity } from '../company/company.entity';
 import { UserEntity } from '../user/user.entity';
 import { ProductUnitOfMeasure } from './product.enum';
 import { ProductCategoryEntity } from './submodules/productCategory/productCategory.entity';
+import { ProductEspecificationEntity } from './submodules/productEspecification/productEspecification.entity';
 
 @Entity({ name: 'products' })
 export class ProductEntity extends BaseEntity {
@@ -39,4 +40,11 @@ export class ProductEntity extends BaseEntity {
   @ManyToOne(() => CompanyEntity)
   @JoinColumn({ name: 'companyUid' })
   company: CompanyEntity;
+
+  @OneToMany(
+    () => ProductEspecificationEntity,
+    (productEspecificationEntity) => productEspecificationEntity.product,
+    { cascade: ['soft-remove'] },
+  )
+  productEspecifications: ProductEspecificationEntity[];
 }

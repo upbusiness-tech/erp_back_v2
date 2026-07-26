@@ -33,6 +33,7 @@ export class CreateProductDto {
 
   @IsNumber()
   @IsPositive()
+  @IsOptional()
   productCategoryId: number;
 
   @IsArray()
@@ -43,6 +44,11 @@ export class CreateProductDto {
 }
 
 export class ProductVariant {
+  @IsNumber()
+  @IsPositive()
+  @IsOptional()
+  id?: number;
+
   @IsString()
   @IsOptional()
   code: string;

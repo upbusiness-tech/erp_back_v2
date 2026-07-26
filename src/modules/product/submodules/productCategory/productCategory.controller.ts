@@ -1,4 +1,4 @@
-import { Crud, CrudController, Override } from '@dataui/crud';
+import { Crud, CrudAuth, CrudController, Override } from '@dataui/crud';
 import { ProductCategoryEntity } from './productCategory.entity';
 import { CreateProductCategoryDto } from './dto/createProductCategory.dto';
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
@@ -14,7 +14,15 @@ import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
   },
   dto: {
     create: CreateProductCategoryDto,
+    update: CreateProductCategoryDto,
   },
+  query: {
+    softDelete: true,
+  },
+})
+@CrudAuth({
+  filter: (req) => ({ companyUid: req.company.companyUid }),
+  persist: (req) => ({ companyUid: req.company.companyUid }),
 })
 @Controller('product-category')
 @UseGuards(EmployeeAuthGuard)
