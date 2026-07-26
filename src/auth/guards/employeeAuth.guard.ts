@@ -28,7 +28,7 @@ export class EmployeeAuthGuard implements CanActivate {
     );
 
     if (!employeeAccessToken)
-      throw new UnauthorizedException('Access token missed');
+      throw new UnauthorizedException('Employee access token missed');
 
     const adminTokenResult = this.tryAdminToken(request, employeeAccessToken);
     if (adminTokenResult) return true;
@@ -39,7 +39,7 @@ export class EmployeeAuthGuard implements CanActivate {
     );
     if (employeeTokenResult) return true;
 
-    throw new UnauthorizedException('Token inválido');
+    throw new UnauthorizedException('Token funcionário inválido');
   }
 
   private tryAdminToken(request: any, token: string): boolean {

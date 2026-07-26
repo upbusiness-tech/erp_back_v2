@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
 import { TypeOrmCrudService } from '@dataui/crud-typeorm';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CompanyEntity } from '../company.entity';
 import { CompanyStatus } from '../company.enum';
+import { UpdateCompanyDto } from '../dto/updateCompany.dto';
 
 @Injectable()
 export class CompanyNestCrudService extends TypeOrmCrudService<CompanyEntity> {
@@ -25,5 +26,14 @@ export class CompanyNestCrudService extends TypeOrmCrudService<CompanyEntity> {
     }
 
     return company;
+  }
+
+  async updateMe(dto: UpdateCompanyDto, companyUid: string) {
+    await this.repo.update(
+      {
+        uid: companyUid,
+      },
+      dto,
+    );
   }
 }
