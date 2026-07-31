@@ -1,5 +1,5 @@
 import { Crud, CrudController } from '@dataui/crud';
-import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import type {
   CompanyTokenPayload,
   EmployeeTokenPayload,
@@ -7,15 +7,15 @@ import type {
 import { CurrentCompany } from 'src/auth/decorators/currentCompany.decorator';
 import { CurrentEmployee } from 'src/auth/decorators/currentEmployee.decorator';
 import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
-import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 import { RequirePermission } from 'src/common/decorators/require-permission.decorator';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { PermissionsRef } from '../permission/const/permissions.ref';
 import { CashFlowEntity } from './cashFlow.entity';
 import { CashFlowDataUiService } from './domain/cashFlowDataUi.service';
-import { OpenCashFlowService } from './domain/openCashFlow.service';
-import { OpenCashFlowDto } from './dto/openCashFlowEntity.dto';
-import { CloseCashFlowDto } from './dto/closeCashFlowEntity.dto';
 import { CloseCashFlowService } from './domain/closeCashFlow.service';
-import { PermissionsRef } from '../permission/const/permissions.ref';
+import { OpenCashFlowService } from './domain/openCashFlow.service';
+import { CloseCashFlowDto } from './dto/closeCashFlowEntity.dto';
+import { OpenCashFlowDto } from './dto/openCashFlowEntity.dto';
 
 @Crud({
   model: {
@@ -51,17 +51,20 @@ export class CashFlowController implements CrudController<CashFlowEntity> {
     );
   }
 
-  @Post('close/:cashFlowId')
+  @Get('open')
+  async getOpenCash(@CurrentCompany() company: CompanyTokenPayload) {
+    return await this.service.getOpenCash(company.companyUid);
+  }
+
+  @Post('close')
   @RequirePermission(PermissionsRef.CashFlow.Close.name)
   async closeOne(
     @Body() dto: CloseCashFlowDto,
     @CurrentCompany() company: CompanyTokenPayload,
     @CurrentEmployee() employee: EmployeeTokenPayload,
-    @Param('cashFlowId') cashFlowId: number,
   ) {
     return await this.closeCashFlowService.execute(
       dto,
-      cashFlowId,
       company.companyUid,
       employee.uid,
     );

@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CashFlowTransactionEntity } from '../cashFlowTransaction.entity';
+import { TransactionOrigin } from '../cashFlowTransaction.enum';
 
 @Injectable()
 export class CashFlowTransactionDataUiService extends TypeOrmCrudService<CashFlowTransactionEntity> {
@@ -15,5 +16,18 @@ export class CashFlowTransactionDataUiService extends TypeOrmCrudService<CashFlo
 
   async save(dto: Partial<CashFlowTransactionEntity>) {
     return await this.repo.save(dto);
+  }
+
+  async getCashFlowTransactionsByOrigin(
+    cashFlowId: number,
+    origin: TransactionOrigin,
+  ) {
+    const transactions = await this.repo.find({
+      where: {
+        origin,
+        cashFlowId: cashFlowId,
+      },
+    });
+    return transactions;
   }
 }

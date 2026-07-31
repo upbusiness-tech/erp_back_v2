@@ -5,6 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.getHttpAdapter().getInstance().set('query parser', 'extended');
   app.enableCors({
     origin: [
       'http://localhost:4200',
@@ -20,6 +21,7 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
     }),
   );
   await app.listen(process.env.PORT ?? 3000);

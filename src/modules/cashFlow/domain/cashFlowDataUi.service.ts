@@ -1,6 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
 import { TypeOrmCrudService } from '@dataui/crud-typeorm';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { InvalidOperationException } from 'src/exceptions/invalidOperation.exception';
 import { Repository } from 'typeorm';
 import { CashFlowEntity } from '../cashFlow.entity';
 
@@ -26,6 +27,46 @@ export class CashFlowDataUiService extends TypeOrmCrudService<CashFlowEntity> {
     if (cashFlow.companyUid !== companyUid) {
       throw new BadRequestException('Caixa não pertence a esta empresa');
     }
+
+    return cashFlow;
+  }
+
+  async getOpenCash(companyUid: string) {
+    const cashFlow = await this.repo.findOne({
+      where: {
+        companyUid: companyUid,
+        isClosed: false,
+      },
+      relations: {
+        openedByUser: {
+          employee: true,
+        },
+        closedByUser: {
+          employee: true,
+        },
+      },
+      select: {
+        openedByUser: {
+          uid: true,
+          employee: {
+            uid: true,
+            name: true,
+          },
+        },
+        closedByUser: {
+          uid: true,
+          employee: {
+            uid: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!cashFlow)
+      throw new InvalidOperationException(
+        'Não existe caixa aberto para a empresa atual!',
+      );
 
     return cashFlow;
   }

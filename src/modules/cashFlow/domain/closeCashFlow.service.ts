@@ -24,7 +24,6 @@ export class CloseCashFlowService {
 
   async execute(
     dto: CloseCashFlowDto,
-    cashFlowId: number,
     companyUid: string,
     employeeUserUid: string,
   ) {
@@ -48,9 +47,7 @@ export class CloseCashFlowService {
       if (!employeeUserFound)
         throw new ResourceNotFoundException('Usuário funcionário');
 
-      const cashFlowOpened = await this.cashFlowService.findOneBy({
-        id: cashFlowId,
-      });
+      const cashFlowOpened = await this.cashFlowService.getOpenCash(companyUid);
 
       if (!cashFlowOpened) throw new ResourceNotFoundException('Caixa');
 
@@ -62,7 +59,7 @@ export class CloseCashFlowService {
           'Usuário não autorizado para abrir o caixa',
         );
 
-      return await this.repo.update(cashFlowId, {
+      return await this.repo.update(cashFlowOpened.id, {
         isClosed: true,
         // FIXME: a data aqui precisa ser gerada pelo próprio postgre, se eu coloco assim ele gera uma data com horário inferior ou superior ao esperado
         closedAt: new Date(),

@@ -1,16 +1,31 @@
-import { Crud, CrudController, Override } from '@dataui/crud';
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import type { CrudRequest } from '@dataui/crud';
+import {
+  Crud,
+  CrudController,
+  CrudRequestInterceptor,
+  Override,
+  ParsedRequest,
+} from '@dataui/crud';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import type {
   CompanyTokenPayload,
   EmployeeTokenPayload,
 } from 'src/auth/auth.types';
 import { CurrentCompany } from 'src/auth/decorators/currentCompany.decorator';
 import { CurrentEmployee } from 'src/auth/decorators/currentEmployee.decorator';
+import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
 import { CashFlowTransactionEntity } from './cashFlowTransaction.entity';
 import { CashFlowTransactionDataUiService } from './domain/cashFlowTransactionDataUi.service';
 import { CreateCashFlowTransactionService } from './domain/createCashFlowTransaction.domain';
+import { ViewCashFlowTransactionStatsService } from './domain/viewCashFlowTransactionStats.service';
 import { CreateCashFlowTransactionDto } from './dto/createCashFlowTransaction.dto';
-import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
 
 @Crud({
   model: {
@@ -28,6 +43,7 @@ import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
 export class CashFlowTransactionController implements CrudController<CashFlowTransactionEntity> {
   constructor(
     public service: CashFlowTransactionDataUiService,
+    public viewCashFlowTransactionStatsService: ViewCashFlowTransactionStatsService,
     private readonly createCashFlowTransactionService: CreateCashFlowTransactionService,
   ) {}
 
@@ -43,5 +59,11 @@ export class CashFlowTransactionController implements CrudController<CashFlowTra
       company.companyUid,
       employee.uid,
     );
+  }
+
+  @Get('stats')
+  @UseInterceptors(CrudRequestInterceptor)
+  async getCashFlowTransactionStats(@ParsedRequest() req: CrudRequest) {
+    return await this.viewCashFlowTransactionStatsService.getMany(req);
   }
 }
