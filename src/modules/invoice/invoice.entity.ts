@@ -14,6 +14,9 @@ export class InvoiceEntity extends BaseEntity {
   @Column({ nullable: true })
   paidAt: Date;
 
+  @Column({ nullable: true })
+  paymentProofUrl: string;
+
   @Column()
   companyUid: string;
 

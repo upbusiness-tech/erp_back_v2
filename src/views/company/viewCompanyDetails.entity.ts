@@ -9,6 +9,7 @@ import { ViewColumn, ViewEntity } from 'typeorm';
     c.document,
     c."contactPhoneNumber",
     p."name" as "planName",
+    p."id" as "planId",
     c."profilePicture" ,
     c."name",
     c.description ,
@@ -33,6 +34,9 @@ export class ViewCompanyDetailsEntity {
 
   @ViewColumn()
   planName: string;
+
+  @ViewColumn()
+  planId: number;
 
   @ViewColumn()
   profilePicture: string;
