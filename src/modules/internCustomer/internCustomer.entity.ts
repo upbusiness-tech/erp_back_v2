@@ -1,7 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { BaseEntity } from 'src/common/base.entity';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CompanyEntity } from '../company/company.entity';
 import { InternCustomerType } from './internCustomer.enum';
-import { BaseEntity } from 'src/common/base.entity';
+import { InternCustomerPriceEntity } from './submodules/internCustomerPrice/internCustomerPrice.entity';
 
 @Entity({ name: 'intern_customers' })
 export class InternCustomerEntity extends BaseEntity {
@@ -11,10 +12,10 @@ export class InternCustomerEntity extends BaseEntity {
   @Column({ type: 'varchar', enum: InternCustomerType })
   type: InternCustomerType;
 
-  @Column()
+  @Column({ nullable: true })
   address: string;
 
-  @Column()
+  @Column({ nullable: true })
   phoneNumber: string;
 
   @Column()
@@ -23,4 +24,11 @@ export class InternCustomerEntity extends BaseEntity {
   @ManyToOne(() => CompanyEntity)
   @JoinColumn({ name: 'companyUid' })
   company: CompanyEntity;
+
+  @OneToMany(
+    () => InternCustomerPriceEntity,
+    (internCustomerPrice) => internCustomerPrice.internCustomer,
+    { cascade: ['soft-remove'] },
+  )
+  internCustomerPrices: InternCustomerPriceEntity[];
 }

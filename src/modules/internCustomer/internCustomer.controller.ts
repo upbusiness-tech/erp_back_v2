@@ -1,11 +1,28 @@
-import { Crud, CrudAuth, CrudController } from '@dataui/crud';
-import { Controller, UseGuards } from '@nestjs/common';
+import { Crud, CrudAuth, CrudController, Override } from '@dataui/crud';
+import {
+  Body,
+  Controller,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import type {
+  CompanyTokenPayload,
+  EmployeeTokenPayload,
+} from 'src/auth/auth.types';
+import { CurrentCompany } from 'src/auth/decorators/currentCompany.decorator';
+import { CurrentEmployee } from 'src/auth/decorators/currentEmployee.decorator';
 import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
+import { RequirePermission } from 'src/common/decorators/require-permission.decorator';
 import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { PermissionsRef } from '../permission/const/permissions.ref';
+import { CreateInternCustomerService } from './domain/createInternCustomer.service';
 import { InternCustomerDataUiService } from './domain/internCustomerDataUi.service';
+import { UpdateInternCustomerService } from './domain/updateInternCustomer.service';
 import { CreateInternCustomerDto } from './dto/createInternCustomer.dto';
 import { InternCustomerEntity } from './internCustomer.entity';
-import { UpdateInternCustomerPriceDto } from './submodules/internCustomerPrice/dto/updateInternCustomerPrice.dto';
 
 @Crud({
   model: {
@@ -13,7 +30,31 @@ import { UpdateInternCustomerPriceDto } from './submodules/internCustomerPrice/d
   },
   dto: {
     create: CreateInternCustomerDto,
-    update: UpdateInternCustomerPriceDto,
+    update: CreateInternCustomerDto,
+  },
+  routes: {
+    exclude: ['createManyBase', 'updateOneBase'],
+    deleteOneBase: {
+      decorators: [
+        RequirePermission(PermissionsRef.InternCustomer.Delete.name),
+      ],
+    },
+  },
+  query: {
+    softDelete: true,
+    join: {
+      internCustomerPrices: {
+        eager: true,
+      },
+      'internCustomerPrices.productEspecification': {
+        eager: true,
+        alias: 'productEspecification',
+      },
+      'internCustomerPrices.productEspecification.product': {
+        eager: true,
+        allow: ['name'],
+      },
+    },
   },
 })
 @CrudAuth({
@@ -23,5 +64,40 @@ import { UpdateInternCustomerPriceDto } from './submodules/internCustomerPrice/d
 @Controller('intern-customer')
 @UseGuards(EmployeeAuthGuard, PermissionsGuard)
 export class InternCustomerController implements CrudController<InternCustomerEntity> {
-  constructor(public service: InternCustomerDataUiService) {}
+  constructor(
+    public service: InternCustomerDataUiService,
+    private readonly createInternCustomerService: CreateInternCustomerService,
+    private readonly updateInternCustomerService: UpdateInternCustomerService,
+  ) {}
+
+  @Post()
+  @Override('createOneBase')
+  @RequirePermission(PermissionsRef.InternCustomer.Create.name)
+  async createOne(
+    @Body() dto: CreateInternCustomerDto,
+    @CurrentCompany() company: CompanyTokenPayload,
+    @CurrentEmployee() employee: EmployeeTokenPayload,
+  ) {
+    return await this.createInternCustomerService.execute(
+      dto,
+      company.companyUid,
+      employee.uid,
+    );
+  }
+
+  @Patch(':id')
+  @RequirePermission(PermissionsRef.InternCustomer.Update.name)
+  async updateOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: CreateInternCustomerDto,
+    @CurrentCompany() company: CompanyTokenPayload,
+    @CurrentEmployee() employee: EmployeeTokenPayload,
+  ) {
+    return await this.updateInternCustomerService.execute(
+      id,
+      dto,
+      company.companyUid,
+      employee.uid,
+    );
+  }
 }

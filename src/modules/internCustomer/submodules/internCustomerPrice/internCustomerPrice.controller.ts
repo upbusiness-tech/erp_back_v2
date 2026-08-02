@@ -14,6 +14,17 @@ import { InternCustomerPriceEntity } from './internCustomerPrice.entity';
     create: CreateInternCustomerPriceDto,
     update: UpdateInternCustomerPriceDto,
   },
+  query: {
+    softDelete: true,
+    join: {
+      productEspecification: {
+        eager: true,
+      },
+      'productEspecification.product': {
+        eager: true,
+      },
+    },
+  },
 })
 @Controller('intern-customer-price')
 @UseGuards(EmployeeAuthGuard)

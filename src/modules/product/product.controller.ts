@@ -54,7 +54,7 @@ import { ProductEntity } from './product.entity';
     join: {
       productCategory: {
         eager: true,
-        allow: ['name'],
+        allow: ['name', 'color'],
       },
       productEspecifications: {
         eager: true,
