@@ -21,6 +21,31 @@ import { SaleEntity } from './sale.entity';
   dto: {
     create: CreateSaleDto,
   },
+  query: {
+    join: {
+      internCustomer: {
+        eager: true,
+      },
+      items: {
+        eager: true,
+      },
+      'items.productEspecification': {
+        eager: true,
+        alias: 'productEspecification',
+      },
+      'items.product': {
+        eager: true,
+        alias: 'product',
+      },
+      'items.internCustomerPrice': {
+        eager: true,
+        alias: 'internCustomerPrice',
+      },
+      payments: {
+        eager: true,
+      },
+    },
+  },
 })
 @CrudAuth({
   filter: (req) => ({ companyUid: req.company.companyUid }),
@@ -45,7 +70,7 @@ export class SaleController implements CrudController<SaleEntity> {
     @CurrentCompany() company: CompanyTokenPayload,
     @CurrentEmployee() employeeUser: EmployeeTokenPayload,
   ) {
-    await this.createSaleService.execute(
+    return await this.createSaleService.execute(
       dto,
       company.companyUid,
       employeeUser.uid,

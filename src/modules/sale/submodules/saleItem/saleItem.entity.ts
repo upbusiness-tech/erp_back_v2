@@ -1,9 +1,10 @@
 import { BaseEntity } from 'src/common/base.entity';
 import { InternCustomerPriceEntity } from 'src/modules/internCustomer/submodules/internCustomerPrice/internCustomerPrice.entity';
 import { ProductEntity } from 'src/modules/product/product.entity';
+import { ProductEspecificationEntity } from 'src/modules/product/submodules/productEspecification/productEspecification.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { SaleEntity } from '../../sale.entity';
-import { ProductEspecificationEntity } from 'src/modules/product/submodules/productEspecification/productEspecification.entity';
+import type { DiscountInfo } from '../../types/sale.types';
 
 @Entity({ name: 'sales_items' })
 export class SaleItemEntity extends BaseEntity {
@@ -16,12 +17,20 @@ export class SaleItemEntity extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   isEspecialPrice: boolean;
 
-  /**
-   * TODO: avaliar o que vai ser contabilizado na venda, em casos de:
-   * 1. um cliente interno foi selecionado aplicando o preço especial, porém também foi passado um discountPrice
-   */
-  @Column({ nullable: true, type: 'decimal' })
-  discountPrice: number;
+  @Column({ type: 'jsonb', nullable: true })
+  productSnapshot: Partial<ProductEspecificationEntity>;
+
+  @Column({ type: 'numeric', precision: 10, scale: 2 })
+  salePriceSnapshot: number;
+
+  @Column({ type: 'numeric', precision: 10, scale: 2, nullable: true })
+  specialPriceSnapshot: number;
+
+  @Column({ type: 'numeric', precision: 10, scale: 2, nullable: true })
+  costPriceSnapshot: number;
+
+  @Column({ type: 'jsonb', nullable: true })
+  discountInfo: DiscountInfo;
 
   @Column({ nullable: true })
   internCustomerPriceId: number;

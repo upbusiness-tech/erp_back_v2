@@ -53,9 +53,7 @@ export class UpdateProductService {
           withDeleted: true,
         });
 
-        const incomingIds = variants
-          .filter((v) => v.id)
-          .map((v) => v.id as number);
+        const incomingIds = variants.filter((v) => v.id).map((v) => v.id);
 
         const toDelete = existingVariants.filter(
           (v) => !incomingIds.includes(v.id),

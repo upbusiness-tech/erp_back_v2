@@ -8,7 +8,7 @@ export class SalePaymentEntity extends BaseEntity {
   @Column({ type: 'varchar', enum: PaymentMethod })
   type: PaymentMethod;
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'numeric', precision: 10, scale: 2 })
   amount: number;
 
   @Column()

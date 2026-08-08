@@ -1,5 +1,6 @@
 import { BaseEntity } from 'src/common/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { InternCustomerPriceEntity } from 'src/modules/internCustomer/submodules/internCustomerPrice/internCustomerPrice.entity';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { ProductEntity } from '../../product.entity';
 
 @Entity({ name: 'product_especifications' })
@@ -34,4 +35,11 @@ export class ProductEspecificationEntity extends BaseEntity {
   @ManyToOne(() => ProductEntity)
   @JoinColumn({ name: 'productId' })
   product: ProductEntity;
+
+  @OneToMany(
+    () => InternCustomerPriceEntity,
+    (internCustomerPrice) => internCustomerPrice.productEspecification,
+    { cascade: ['soft-remove'] },
+  )
+  internCustomerPrices: InternCustomerPriceEntity[];
 }

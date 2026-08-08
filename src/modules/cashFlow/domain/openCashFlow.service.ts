@@ -73,6 +73,4 @@ export class OpenCashFlowService {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
-
-
 }

@@ -13,6 +13,7 @@ import { ProductCategoryModule } from './submodules/productCategory/productCateg
 import { ProductEspecificationEntity } from './submodules/productEspecification/productEspecification.entity';
 import { ProductEspecificationModule } from './submodules/productEspecification/productEspecification.module';
 import { ProductTransactionRecordsModule } from './submodules/productTransaction/productTransactionRecords.module';
+import { InternCustomerPriceEntity } from '../internCustomer/submodules/internCustomerPrice/internCustomerPrice.entity';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ProductTransactionRecordsModule } from './submodules/productTransaction
       ProductEntity,
       ViewProductExpandedDetailsEntity,
       ProductEspecificationEntity,
+      InternCustomerPriceEntity,
     ]),
     ProductCategoryModule,
     ProductEspecificationModule,
