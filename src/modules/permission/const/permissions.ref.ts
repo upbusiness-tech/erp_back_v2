@@ -8,6 +8,7 @@ import { ProductPermissions } from './keys/product.permission';
 import { ReportPermissions } from './keys/report.permission';
 import { SalePermissions } from './keys/sale.permission';
 import { SideBarPermissions } from './keys/sidebar.permission';
+import { StatsPermissions } from './keys/stats.permission';
 
 export const PermissionsRef = {
   Company: CompanyPermissions,
@@ -19,5 +20,6 @@ export const PermissionsRef = {
   Invoice: InvoicePermissions,
   Report: ReportPermissions,
   SideBar: SideBarPermissions,
+  Stats: StatsPermissions,
   Admin: AdminPermissions,
 };

@@ -10,6 +10,7 @@ import { InternCustomerModule } from './modules/internCustomer/internCustomer.mo
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { PlanModule } from './modules/plan/plan.module';
 import { ProductModule } from './modules/product/product.module';
+import { ReportModule } from './modules/report/report.module';
 import { SaleModule } from './modules/sale/sale.module';
 import { UserModule } from './modules/user/user.module';
 import { PermissionModule } from './modules/permission/permission.module';
@@ -32,6 +33,7 @@ import { AllExceptionsFilter } from './exceptions/handler/allExceptions.handler'
     InvoiceModule,
     EmployeeModule,
     ProductModule,
+    ReportModule,
     CashFlowModule,
     UserModule,
     SaleModule,

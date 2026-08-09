@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ViewProductExpandedDetailsEntity } from 'src/views/product/viewProductExpandedDetails.entity';
+import { ViewTopSellingProductsEntity } from 'src/views/product/viewTopSellingProducts.entity';
 import { CompanyModule } from '../company/company.module';
 import { UserModule } from '../user/user.module';
 import { CreateProductService } from './domain/createProduct.service';
 import { ProductDataUiService } from './domain/productDataUi.service';
 import { UpdateProductService } from './domain/updateProduct.service';
 import { ViewProductExpandedDetailsService } from './domain/viewProductExpandedDetails.service';
+import { ViewTopSellingProductsService } from './domain/viewTopSellingProducts.service';
 import { ProductController } from './product.controller';
 import { ProductEntity } from './product.entity';
 import { ProductCategoryModule } from './submodules/productCategory/productCategory.module';
@@ -20,6 +22,7 @@ import { InternCustomerPriceEntity } from '../internCustomer/submodules/internCu
     TypeOrmModule.forFeature([
       ProductEntity,
       ViewProductExpandedDetailsEntity,
+      ViewTopSellingProductsEntity,
       ProductEspecificationEntity,
       InternCustomerPriceEntity,
     ]),
@@ -35,6 +38,7 @@ import { InternCustomerPriceEntity } from '../internCustomer/submodules/internCu
     UpdateProductService,
     ProductDataUiService,
     ViewProductExpandedDetailsService,
+    ViewTopSellingProductsService,
   ],
 })
 export class ProductModule {}

@@ -32,6 +32,7 @@ import { CreateProductService } from './domain/createProduct.service';
 import { ProductDataUiService } from './domain/productDataUi.service';
 import { UpdateProductService } from './domain/updateProduct.service';
 import { ViewProductExpandedDetailsService } from './domain/viewProductExpandedDetails.service';
+import { ViewTopSellingProductsService } from './domain/viewTopSellingProducts.service';
 import { CreateProductDto } from './dto/createProduct.dto';
 import { ProductEntity } from './product.entity';
 
@@ -72,6 +73,7 @@ export class ProductController implements CrudController<ProductEntity> {
   constructor(
     public service: ProductDataUiService,
     public viewProductExpandedDetailsService: ViewProductExpandedDetailsService,
+    public readonly viewTopSellingProductsService: ViewTopSellingProductsService,
     public readonly createProductService: CreateProductService,
     public readonly updateProductService: UpdateProductService,
   ) {}
@@ -111,5 +113,11 @@ export class ProductController implements CrudController<ProductEntity> {
   @UseInterceptors(CrudRequestInterceptor)
   async getManyExpanded(@ParsedRequest() req: CrudRequest) {
     return await this.viewProductExpandedDetailsService.getMany(req);
+  }
+
+  @Get('top-selling')
+  @UseInterceptors(CrudRequestInterceptor)
+  async getTopSelling(@ParsedRequest() req: CrudRequest) {
+    return await this.viewTopSellingProductsService.getMany(req);
   }
 }
