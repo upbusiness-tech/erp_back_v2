@@ -68,7 +68,9 @@ export class OpenCashFlowService {
         companyUid,
       };
 
-      return await this.repo.save(createCashFlowEntity);
+      await this.repo.save(createCashFlowEntity);
+
+      return await this.cashFlowService.getOpenCash(companyUid);
     } catch (error: any) {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }

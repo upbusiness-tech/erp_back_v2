@@ -1,7 +1,7 @@
 import { TypeOrmCrudService } from '@dataui/crud-typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { CompanyEntity } from '../../../company.entity';
 import { CompanySettingUsageEntity } from '../../companySettingsUsage/companySettingUsage.entity';
 import { CompanySettingEntity } from '../companySetting.entity';
@@ -21,35 +21,20 @@ export class CompanySettingService extends TypeOrmCrudService<CompanySettingEnti
   }
 
   async sync(): Promise<{ definitionsCreated: number; usageCreated: number }> {
-    const allSettingDefs = Object.values(SettingsRef).flatMap((group) =>
-      Object.values(group),
+    const allSettingDefs = Object.entries(SettingsRef).flatMap(
+      ([module, group]) =>
+        Object.values(group).map((def) => ({
+          module,
+          key: def.key,
+          description: def.description,
+          default: def.defaultActive,
+          planId: def.plan,
+        })),
     );
 
-    const existingDefs = await this.repo.find({
-      select: { id: true, key: true },
-    });
-    const existingKeys = new Set(existingDefs.map((d) => d.key));
+    await this.repo.upsert(allSettingDefs, ['key']);
 
-    const newDefs: CompanySettingEntity[] = [];
-    for (const def of allSettingDefs) {
-      if (existingKeys.has(def.key)) continue;
-
-      const entity = new CompanySettingEntity();
-      entity.key = def.key;
-      entity.description = def.description;
-      entity.default = def.defaultActive;
-      entity.planId = def.plan;
-      newDefs.push(entity);
-    }
-
-    let definitionsCreated = 0;
-    if (newDefs.length > 0) {
-      await this.repo.insert(newDefs);
-      definitionsCreated = newDefs.length;
-    }
-
-    const currentDefs =
-      newDefs.length > 0 ? await this.repo.find() : existingDefs;
+    const currentDefs = await this.repo.find();
 
     const companies = await this.companyRepo.find({
       select: { uid: true, planId: true },
@@ -62,13 +47,13 @@ export class CompanySettingService extends TypeOrmCrudService<CompanySettingEnti
       existingUsage.map((u) => `${u.companyUid}:${u.companySettingId}`),
     );
 
-    const newUsage: CompanySettingUsageEntity[] = [];
+    const newUsage: Partial<CompanySettingUsageEntity>[] = [];
     for (const company of companies) {
       for (const def of currentDefs) {
         const defWithPlan = allSettingDefs.find((d) => d.key === def.key);
         if (
-          defWithPlan?.plan &&
-          company.planId !== defWithPlan.plan.valueOf()
+          defWithPlan?.planId &&
+          company.planId !== defWithPlan.planId.valueOf()
         ) {
           continue;
         }
@@ -76,11 +61,11 @@ export class CompanySettingService extends TypeOrmCrudService<CompanySettingEnti
         const key = `${company.uid}:${def.id}`;
         if (usageKeySet.has(key)) continue;
 
-        const usage = new CompanySettingUsageEntity();
-        usage.isActive = def.default;
-        usage.companyUid = company.uid;
-        usage.companySettingId = String(def.id);
-        newUsage.push(usage);
+        newUsage.push({
+          isActive: def.default,
+          companyUid: company.uid,
+          companySettingId: def.id,
+        });
       }
     }
 
@@ -90,6 +75,26 @@ export class CompanySettingService extends TypeOrmCrudService<CompanySettingEnti
       usageCreated = newUsage.length;
     }
 
-    return { definitionsCreated, usageCreated };
+    return { definitionsCreated: allSettingDefs.length, usageCreated };
+  }
+
+  async createDefaultUsageForCompany(
+    entityManager: EntityManager,
+    companyUid: string,
+    planId: number,
+  ): Promise<void> {
+    const defs = await entityManager.find(CompanySettingEntity);
+
+    const usage = defs
+      .filter((d) => d.planId === planId)
+      .map((d) => ({
+        isActive: d.default,
+        companyUid,
+        companySettingId: d.id,
+      }));
+
+    if (usage.length > 0) {
+      await entityManager.insert(CompanySettingUsageEntity, usage);
+    }
   }
 }

@@ -6,6 +6,9 @@ import { Column, Entity, JoinColumn, ManyToOne, Unique } from 'typeorm';
 @Unique(['key'])
 export class CompanySettingEntity extends BaseEntity {
   @Column()
+  module: string;
+
+  @Column()
   key: string;
 
   @Column()

@@ -14,10 +14,10 @@ export class CompanySettingUsageEntity extends BaseEntity {
 
   @ManyToOne(() => CompanyEntity)
   @JoinColumn({ name: 'companyUid' })
-  comany: CompanyEntity;
+  company: CompanyEntity;
 
   @Column()
-  companySettingId: string;
+  companySettingId: number;
 
   @ManyToOne(() => CompanySettingEntity)
   @JoinColumn({ name: 'companySettingId' })

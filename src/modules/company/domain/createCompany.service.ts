@@ -101,6 +101,12 @@ export class CreateCompanyService {
           // );
 
           await transactionalEntityManager.save(InvoiceEntity, firstInvoiceDto);
+
+          await this.companySettingService.createDefaultUsageForCompany(
+            transactionalEntityManager,
+            companySaved.uid,
+            companySaved.planId,
+          );
         },
       );
     } catch (error) {
