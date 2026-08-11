@@ -47,8 +47,8 @@ export class ProductDashboardService {
     const params: DashboardParams = {
       companyUid,
       status: SaleStatus.COMPLETED,
-      fromDate: period.fromDate,
-      toDate: period.toExclusiveDate,
+      fromDate: toTimestampUTC(period.fromDate),
+      toDate: toTimestampUTC(period.toExclusiveDate),
       threshold: PRODUCT_DASHBOARD_RESTOCK_THRESHOLD,
       limit,
     };
@@ -134,7 +134,7 @@ export class ProductDashboardService {
     const result = await this.eligibleSalesBase(params)
       .select('COALESCE(SUM(si.quantitySold), 0)', 'unitsSold')
       .addSelect(
-        'COALESCE(SUM(si.quantitySold * COALESCE(si.specialPriceSnapshot, si.salePriceSnapshot)), 0)',
+        'COALESCE(SUM(si.quantitySold * (COALESCE(si.specialPriceSnapshot, si.salePriceSnapshot) - COALESCE(si.costPriceSnapshot, 0))), 0)',
         'revenue',
       )
       .addSelect(`(${zeroStockCount.getQuery()})`, 'zeroStockProducts')
@@ -181,7 +181,7 @@ export class ProductDashboardService {
       .addSelect('p.name', 'productName')
       .addSelect('SUM(si.quantitySold)', 'quantitySold')
       .addSelect(
-        'SUM(si.quantitySold * COALESCE(si.specialPriceSnapshot, si.salePriceSnapshot))',
+        'SUM(si.quantitySold * (COALESCE(si.specialPriceSnapshot, si.salePriceSnapshot) - COALESCE(si.costPriceSnapshot, 0)))',
         'revenue',
       )
       .addSelect('COALESCE(ps."stockQuantity", 0)', 'stockQuantity')
@@ -217,7 +217,7 @@ export class ProductDashboardService {
       .select('si.productId', 'productId')
       .addSelect('SUM(si.quantitySold)', 'quantitySold')
       .addSelect(
-        'SUM(si.quantitySold * COALESCE(si.specialPriceSnapshot, si.salePriceSnapshot))',
+        'SUM(si.quantitySold * (COALESCE(si.specialPriceSnapshot, si.salePriceSnapshot) - COALESCE(si.costPriceSnapshot, 0)))',
         'revenue',
       )
       .groupBy('si.productId');
@@ -276,4 +276,12 @@ function toDashboardEntry(row: DashboardAggregateRow): ProductDashboardEntry {
 function toNumber(value: number | string): number {
   const parsed = Number(value ?? 0);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function pad(n: number): string {
+  return String(n).padStart(2, '0');
+}
+
+function toTimestampUTC(date: Date): string {
+  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())} ${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())}`;
 }
