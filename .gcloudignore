@@ -1,0 +1,14 @@
+node_modules
+dist
+.git
+.gitignore
+test
+docker-compose.yml
+.env
+.env.*
+openspec
+v2
+*.md
+!README.md
+.eslintrc*
+.prettier*

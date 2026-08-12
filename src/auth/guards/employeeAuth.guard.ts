@@ -50,10 +50,10 @@ export class EmployeeAuthGuard implements CanActivate {
 
       if (adminPayload.role !== Role.ADMIN) return false;
 
-      const companyUid = request.headers['x-admin-company-uid'] as string;
+      const companyUid = request.headers['x-company-token'] as string;
       if (!companyUid) {
         throw new UnauthorizedException(
-          'Header x-admin-company-uid é obrigatório para admin',
+          'Header x-company-token é obrigatório para admin',
         );
       }
 

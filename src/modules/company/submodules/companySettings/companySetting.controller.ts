@@ -6,6 +6,7 @@ import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 import { CompanySettingEntity } from './companySetting.entity';
 import { CompanySettingService } from './domain/companySetting.service';
 import { PermissionsRef } from 'src/modules/permission/const/permissions.ref';
+import { CompanyAuthGuard } from 'src/auth/guards/companyAuth.guard';
 
 @Crud({
   model: {
@@ -13,6 +14,7 @@ import { PermissionsRef } from 'src/modules/permission/const/permissions.ref';
   },
 })
 @Controller('company-setting')
+@UseGuards(CompanyAuthGuard)
 export class CompanySettingController implements CrudController<CompanySettingEntity> {
   constructor(public service: CompanySettingService) {}
 

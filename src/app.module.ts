@@ -18,6 +18,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './exceptions/handler/allExceptions.handler';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { AllExceptionsFilter } from './exceptions/handler/allExceptions.handler'
     UserModule,
     SaleModule,
     InternCustomerModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [

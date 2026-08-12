@@ -6,13 +6,20 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.getHttpAdapter().getInstance().set('query parser', 'extended');
+  const localhostOrigins = [
+    'http://localhost:4200',
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://localhost:8080',
+  ];
+
+  const corsOriginsEnv = process.env.CORS_ORIGINS;
+  const origins = corsOriginsEnv
+    ? [...localhostOrigins, ...corsOriginsEnv.split(',').map((o) => o.trim())]
+    : localhostOrigins;
+
   app.enableCors({
-    origin: [
-      'http://localhost:4200',
-      'http://localhost:3000',
-      'http://localhost:5173',
-      'http://localhost:8080',
-    ],
+    origin: origins,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
