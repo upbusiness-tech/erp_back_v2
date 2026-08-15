@@ -49,12 +49,39 @@ Estas variáveis precisam ser configuradas no serviço Cloud Run:
 | `JWT_EMPLOYEE_SECRET` | Secret JWT employee | `seu-secret` |
 | `JWT_ADMIN_SECRET` | Secret JWT admin | `seu-secret` |
 | `JWT_EXPIRATION_TIME` | Tempo de expiração JWT | `3000` |
-| `CORS_ORIGINS` | URL do frontend Vercel | `https://erp-front-v2.vercel.app/` |
+| `CORS_ORIGINS` | URL do frontend Vercel | `https://erp-front-v2.vercel.app` |
+| `TZ` | Timezone do sistema operacional | `America/Sao_Paulo` |
+| `PGTZ` | Timezone da sessão PostgreSQL | `America/Sao_Paulo` |
 | `RUN_MIGRATIONS` | Rodar migrations no startup | `true` (opcional) |
 
 ### Desenvolvimento (.env)
 
 O `.env` local continua funcionando normalmente. As configurações de produção são injetadas apenas no Cloud Run.
+
+**Importante:** Para manter consistência de datas entre local e Cloud Run, configure também no `.env` local:
+
+```
+TZ=America/Sao_Paulo
+PGTZ=America/Sao_Paulo
+```
+
+E no `docker-compose.yml`, adicione as mesmas variáveis no serviço `postgres`:
+
+```yaml
+environment:
+  - POSTGRES_DB=erp-db
+  - POSTGRES_USER=postgres
+  - POSTGRES_PASSWORD=postgres
+  - TZ=America/Sao_Paulo
+  - PGTZ=America/Sao_Paulo
+```
+
+Depois de alterar, reinicie o container local:
+
+```bash
+docker compose down
+docker compose up -d
+```
 
 ## Makefile - Comandos
 
@@ -135,9 +162,7 @@ make deploy-all
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-> **Por que backend primeiro?** O frontend precisa da URL da API para funcionar. O CORS já está configurado no deploy (`CORS_ORIGINS=https://erp-front-v2.vercel.app/`).
-
-> **Por que backend primeiro?** O frontend precisa da URL da API para funcionar. O backend só precisa saber a URL do frontend para CORS, e isso pode ser configurado depois.
+> **Por que backend primeiro?** O frontend precisa da URL da API para funcionar. O CORS já está configurado no deploy (`CORS_ORIGINS=https://erp-front-v2.vercel.app`).
 
 ## Configurar Frontend no Vercel
 
@@ -176,6 +201,31 @@ Verifique:
 1. `DB_SSL=true` está configurado
 2. `DB_HOST` é o host com pooler do Neon (termina em `-pooler`)
 3. As credenciais estão corretas no `make secrets`
+
+### Datas/horários diferentes entre local e Cloud Run
+
+As colunas `createdAt`, `updatedAt` e `deletedAt` são `timestamp without time zone` no PostgreSQL — ou seja, o banco armazena o horário literalmente, sem fuso. A interpretação depende do timezone da conexão.
+
+Para manter consistência, **todos os ambientes devem usar o mesmo timezone** (`America/Sao_Paulo` neste caso):
+
+- **Cloud Run**: env vars `TZ=America/Sao_Paulo` e `PGTZ=America/Sao_Paulo` (já configurado)
+- **API local**: adicione no `.env`:
+  ```
+  TZ=America/Sao_Paulo
+  PGTZ=America/Sao_Paulo
+  ```
+- **PostgreSQL local**: adicione no `docker-compose.yml`:
+  ```yaml
+  environment:
+    - TZ=America/Sao_Paulo
+    - PGTZ=America/Sao_Paulo
+  ```
+  Depois reinicie o container:
+  ```bash
+  docker compose down && docker compose up -d
+  ```
+
+Se os dados já existentes no banco estiverem com fuso errado, eles continuarão deslocados. A configuração acima garante consistência para **novos registros e leituras futuras**.
 
 ### Erro `synchronize: false` / tabelas não encontradas
 

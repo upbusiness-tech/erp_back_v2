@@ -1,0 +1,1 @@
+export const SALES_DASHBOARD_MAX_RANGE_DAYS = 366;

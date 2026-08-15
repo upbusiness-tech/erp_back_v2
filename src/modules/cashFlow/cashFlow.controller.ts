@@ -27,6 +27,19 @@ import { OpenCashFlowDto } from './dto/openCashFlowEntity.dto';
   dto: {
     create: OpenCashFlowDto,
   },
+  query: {
+    join: {
+      openedByUser: {
+        eager: false,
+        allow: ['uid'],
+      },
+      'openedByUser.employee': {
+        eager: false,
+        allow: ['uid', 'name'],
+        alias: 'employee',
+      },
+    },
+  },
 })
 @Controller('cash-flow')
 @UseGuards(EmployeeAuthGuard, PermissionsGuard)
