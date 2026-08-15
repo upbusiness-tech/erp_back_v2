@@ -1,5 +1,5 @@
 import { BaseEntity } from 'src/common/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, Unique } from 'typeorm';
 import { CompanyEntity } from '../company/company.entity';
 import { PaymentMethod } from '../sale/submodules/salePayment/salePayment.enum';
 import { UserEntity } from '../user/user.entity';
@@ -10,7 +10,11 @@ export type InformedValue = {
 };
 
 @Entity({ name: 'cash_flows' })
+@Unique(['companyUid', 'code'])
 export class CashFlowEntity extends BaseEntity {
+  @Column()
+  code: string;
+
   @Column({ type: 'boolean', default: false })
   isClosed: boolean;
 

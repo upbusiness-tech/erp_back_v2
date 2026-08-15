@@ -10,6 +10,8 @@ import { CashFlowEntity } from '../cashFlow.entity';
 import { OpenCashFlowDto } from '../dto/openCashFlowEntity.dto';
 import { CashFlowDataUiService } from './cashFlowDataUi.service';
 
+const CODE_LENGTH = 6;
+
 @Injectable()
 export class OpenCashFlowService {
   constructor(
@@ -62,13 +64,25 @@ export class OpenCashFlowService {
           'Funcionário inativo não pode abrir o caixa',
         );
 
-      const createCashFlowEntity: Partial<CashFlowEntity> = {
-        initialBalance: dto.initialBalance,
-        openedByUserUid: employeeUserUid,
-        companyUid,
-      };
+      await this.repo.manager.transaction(async (entityManager) => {
+        const [{ lastNumber }] = await entityManager.query(
+          `INSERT INTO cash_flow_code_sequence ("companyUid", "lastNumber")
+           VALUES ($1, 1)
+           ON CONFLICT ("companyUid")
+           DO UPDATE SET "lastNumber" = cash_flow_code_sequence."lastNumber" + 1
+           RETURNING "lastNumber"`,
+          [companyUid],
+        );
 
-      await this.repo.save(createCashFlowEntity);
+        const createCashFlowEntity: Partial<CashFlowEntity> = {
+          code: String(lastNumber).padStart(CODE_LENGTH, '0'),
+          initialBalance: dto.initialBalance,
+          openedByUserUid: employeeUserUid,
+          companyUid,
+        };
+
+        await entityManager.save(CashFlowEntity, createCashFlowEntity);
+      });
 
       return await this.cashFlowService.getOpenCash(companyUid);
     } catch (error: any) {
