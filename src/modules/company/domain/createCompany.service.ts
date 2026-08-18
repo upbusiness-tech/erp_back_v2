@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import { CompanyAuthService } from 'src/auth/submodules/companyAuth/companyAuth.service';
 import { getFirstPaymentDate } from 'src/common/date';
 import { generateUsername } from 'src/common/username';
 import { saltRounds } from 'src/consts/bcrypt';
@@ -11,7 +12,9 @@ import { InvoiceEntity } from 'src/modules/invoice/invoice.entity';
 import { InvoiceStatus } from 'src/modules/invoice/invoice.enum';
 import { UserEntity } from 'src/modules/user/user.entity';
 import { UserType } from 'src/modules/user/user.enum';
-import { Repository } from 'typeorm';
+import { EmployeeDefaultPermissions } from 'src/modules/permission/const/employee-default-permissions.ref';
+import { PermissionEntity } from 'src/modules/permission/permission.entity';
+import { In, Repository } from 'typeorm';
 import { CompanyEntity } from '../company.entity';
 import { CompanyStatus } from '../company.enum';
 import { CreateCompanyDto } from '../dto/createCompany.dto';
@@ -25,6 +28,7 @@ export class CreateCompanyService {
     @InjectRepository(CompanyEntity)
     private repo: Repository<CompanyEntity>,
     private readonly companySettingService: CompanySettingService,
+    private readonly companyAuthService: CompanyAuthService,
   ) {}
 
   async execute(dto: CreateCompanyDto) {
@@ -38,11 +42,18 @@ export class CreateCompanyService {
             { ...values, status: CompanyStatus.ACTIVE },
           );
 
+          const firebaseUserRecord =
+            await this.companyAuthService.registerOnFirebase(
+              { email, password },
+              companySaved.uid,
+            );
+
           const companyUserDto: Partial<UserEntity> = {
             companyUid: companySaved.uid,
             email: email,
             password: await this.encryptPassword(password),
             type: UserType.COMPANY,
+            firebaseUserUid: firebaseUserRecord.uid,
           };
 
           await transactionalEntityManager.save(UserEntity, companyUserDto);
@@ -78,12 +89,26 @@ export class CreateCompanyService {
             }
           }
 
+          const defaultPermissions =
+            EmployeeDefaultPermissions[EmployeeType.MANAGER];
+
+          const foundPermissions = await transactionalEntityManager.find(
+            PermissionEntity,
+            {
+              where: {
+                key: In(defaultPermissions),
+                isAdminPermission: false,
+              },
+            },
+          );
+
           const employeeUserDto: Partial<UserEntity> = {
             employeeUid: employeeSaved.uid,
             password: await this.encryptPassword('1234'),
             username: usernameGenerated,
             companyUid: companySaved.uid,
             type: UserType.EMPLOYEE,
+            permissions: foundPermissions,
           };
 
           await transactionalEntityManager.save(UserEntity, employeeUserDto);
@@ -94,11 +119,6 @@ export class CreateCompanyService {
             status: InvoiceStatus.PENDING,
             dueDate: getFirstPaymentDate(values.paymentDay),
           };
-
-          // await transactionalEntityManager.save(
-          //   CompanySettingEntity,
-          //   this.companySettingService.buildDefaultSettings(companySaved.uid),
-          // );
 
           await transactionalEntityManager.save(InvoiceEntity, firstInvoiceDto);
 

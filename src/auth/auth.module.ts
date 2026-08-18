@@ -5,12 +5,12 @@ import { UserModule } from 'src/modules/user/user.module';
 import { AuthController } from './auth.controller';
 import { CompanyAuthGuard } from './guards/companyAuth.guard';
 import { EmployeeAuthGuard } from './guards/employeeAuth.guard';
+import { AdminAuthModule } from './submodules/adminAuth/adminAuth.module';
+import { AdminAuthService } from './submodules/adminAuth/adminAuth.service';
 import { CompanyAuthModule } from './submodules/companyAuth/companyAuth.module';
 import { CompanyAuthService } from './submodules/companyAuth/companyAuth.service';
 import { EmployeeAuthModule } from './submodules/employeeAuth/employeeAuth.module';
 import { EmployeeAuthService } from './submodules/employeeAuth/employeeAuth.service';
-import { AdminAuthModule } from './submodules/adminAuth/adminAuth.module';
-import { AdminAuthService } from './submodules/adminAuth/adminAuth.service';
 
 @Module({
   imports: [

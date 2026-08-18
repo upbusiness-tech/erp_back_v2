@@ -1,4 +1,4 @@
-import { Crud, CrudController } from '@dataui/crud';
+import { Crud, CrudAuth, CrudController } from '@dataui/crud';
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import type {
   CompanyTokenPayload,
@@ -42,6 +42,10 @@ import { OpenCashFlowDto } from './dto/openCashFlowEntity.dto';
   },
 })
 @Controller('cash-flow')
+@CrudAuth({
+  filter: (req) => ({ companyUid: req.company.companyUid }),
+  persist: (req) => ({ companyUid: req.company.companyUid }),
+})
 @UseGuards(EmployeeAuthGuard, PermissionsGuard)
 export class CashFlowController implements CrudController<CashFlowEntity> {
   constructor(

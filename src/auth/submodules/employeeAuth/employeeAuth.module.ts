@@ -15,7 +15,7 @@ import { UserDataUiService } from 'src/modules/user/domain/userDataUi.service';
       useFactory: (config: ConfigService) => ({
         secret: config.getOrThrow('JWT_EMPLOYEE_SECRET'),
         signOptions: {
-          expiresIn: '12h',
+          expiresIn: '8h',
         },
       }),
     }),

@@ -54,9 +54,14 @@ export class AddSaleDiscountsAndSnapshots1786213227793 implements MigrationInter
       `ALTER TABLE "sales_services" ALTER COLUMN "amount" TYPE numeric(10,2)`,
     );
 
-    // 5. Migrate existing discountPrice values into discountInfo
+    // 5. Migrate existing discountPrice values into discountInfo (only if legacy column exists)
     await queryRunner.query(
-      `UPDATE "sales_items" SET "discountInfo" = jsonb_build_object('value', "discountPrice") WHERE "discountPrice" IS NOT NULL`,
+      `DO $$
+       BEGIN
+         IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'sales_items' AND column_name = 'discountPrice') THEN
+           UPDATE "sales_items" SET "discountInfo" = jsonb_build_object('value', "discountPrice") WHERE "discountPrice" IS NOT NULL;
+         END IF;
+       END $$;`,
     );
 
     // 6. Drop the old discountPrice column

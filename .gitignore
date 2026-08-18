@@ -37,6 +37,10 @@ lerna-debug.log*
 
 # dotenv environment variable files
 .env
+
+# firebase service accounts
+*-firebase-adminsdk-*.json
+serviceAccount*.json
 .env.development.local
 .env.test.local
 .env.production.local

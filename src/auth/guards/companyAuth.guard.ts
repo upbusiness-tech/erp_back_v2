@@ -7,7 +7,8 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from 'src/common/roles';
-import { AdminTokenPayload, CompanyTokenPayload } from '../auth.types';
+import { firebaseAuth } from 'src/config/firebase/firebase.config';
+import { AdminTokenPayload } from '../auth.types';
 
 @Injectable()
 export class CompanyAuthGuard implements CanActivate {
@@ -16,14 +17,14 @@ export class CompanyAuthGuard implements CanActivate {
     private configService: ConfigService,
   ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = request.headers['x-company-token'] as string;
 
     if (!token) throw new UnauthorizedException('Company token missed');
 
+    if (await this.tryCompanyToken(request, token)) return true;
     if (this.tryAdminToken(request, token)) return true;
-    if (this.tryCompanyToken(request, token)) return true;
 
     throw new UnauthorizedException('Token inválido');
   }
@@ -64,13 +65,12 @@ export class CompanyAuthGuard implements CanActivate {
     }
   }
 
-  private tryCompanyToken(request: any, token: string): boolean {
+  private async tryCompanyToken(request: any, token: string): Promise<boolean> {
     try {
-      const payload = this.jwtService.verify<CompanyTokenPayload>(token, {
-        secret: this.configService.get('JWT_COMPANY_SECRET'),
-      });
+      const payload = await firebaseAuth.verifyIdToken(token);
 
-      if (payload.role !== Role.COMPANY) throw new Error();
+      if (payload.role !== Role.COMPANY)
+        throw new Error('Role Company não identificada');
 
       request.company = payload;
       request.user = {

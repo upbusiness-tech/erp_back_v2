@@ -7,11 +7,8 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from 'src/common/roles';
-import {
-  AdminTokenPayload,
-  CompanyTokenPayload,
-  EmployeeTokenPayload,
-} from '../auth.types';
+import { firebaseAuth } from 'src/config/firebase/firebase.config';
+import { AdminTokenPayload, EmployeeTokenPayload } from '../auth.types';
 
 @Injectable()
 export class EmployeeAuthGuard implements CanActivate {
@@ -20,7 +17,7 @@ export class EmployeeAuthGuard implements CanActivate {
     private configService: ConfigService,
   ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
     const employeeAccessToken = this.extractBearer(
@@ -30,10 +27,10 @@ export class EmployeeAuthGuard implements CanActivate {
     if (!employeeAccessToken)
       throw new UnauthorizedException('Employee access token missed');
 
-    const adminTokenResult = this.tryAdminToken(request, employeeAccessToken);
-    if (adminTokenResult) return true;
+    // const adminTokenResult = this.tryAdminToken(request, employeeAccessToken);
+    // if (adminTokenResult) return true;
 
-    const employeeTokenResult = this.tryEmployeeToken(
+    const employeeTokenResult = await this.tryEmployeeToken(
       request,
       employeeAccessToken,
     );
@@ -77,7 +74,10 @@ export class EmployeeAuthGuard implements CanActivate {
     }
   }
 
-  private tryEmployeeToken(request: any, token: string): boolean {
+  private async tryEmployeeToken(
+    request: any,
+    token: string,
+  ): Promise<boolean> {
     const companyToken = request.headers['x-company-token'] as string;
     if (!companyToken) return false;
 
@@ -89,12 +89,7 @@ export class EmployeeAuthGuard implements CanActivate {
         },
       );
 
-      const companyPayload = this.jwtService.verify<CompanyTokenPayload>(
-        companyToken,
-        {
-          secret: this.configService.get('JWT_COMPANY_SECRET'),
-        },
-      );
+      const companyPayload = await firebaseAuth.verifyIdToken(companyToken);
 
       if (employeePayload.companyUid !== companyPayload.companyUid) {
         throw new UnauthorizedException(

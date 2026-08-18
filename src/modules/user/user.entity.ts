@@ -34,6 +34,9 @@ export class UserEntity extends BaseUidEntity {
   company: CompanyEntity;
 
   @Column({ nullable: true })
+  firebaseUserUid: string;
+
+  @Column({ nullable: true })
   employeeUid: string;
 
   @OneToOne(() => EmployeeEntity, (employee) => employee.user, {
