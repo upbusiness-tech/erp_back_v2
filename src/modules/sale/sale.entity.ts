@@ -74,6 +74,9 @@ export class SaleEntity extends BaseEntity {
   total: number;
 
   @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
+  amountProfit: number;
+
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
   amountPaid: number;
 
   @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })

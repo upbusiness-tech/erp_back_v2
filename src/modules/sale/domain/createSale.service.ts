@@ -97,6 +97,8 @@ export class CreateSaleService {
           internPrices.map((p) => [p.id, p.specialPrice]),
         );
 
+        let saleAmountProfit: number = 0;
+
         // 3. Build sale items with price and product snapshots
         const saleItems = items.map((item) => {
           const spec = specMap.get(item.productEspecificationId);
@@ -107,6 +109,12 @@ export class CreateSaleService {
           const productSnapshot: Partial<ProductEspecificationEntity> = {
             ...spec,
           };
+
+          const profit =
+            ((specialPrice ? specialPrice : spec.salePrice) - spec.costPrice) *
+            item.quantitySold;
+
+          saleAmountProfit += profit;
 
           return {
             ...item,
@@ -168,6 +176,7 @@ export class CreateSaleService {
           amountPaid: totals.paid,
           change: totals.change,
           summary: totals.summary,
+          amountProfit: saleAmountProfit,
         });
 
         // 9. Save payments, items and services
