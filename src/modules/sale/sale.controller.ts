@@ -1,5 +1,12 @@
 import { Crud, CrudAuth, CrudController, Override } from '@dataui/crud';
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import type {
   CompanyTokenPayload,
   EmployeeTokenPayload,
@@ -7,12 +14,14 @@ import type {
 import { CurrentCompany } from 'src/auth/decorators/currentCompany.decorator';
 import { CurrentEmployee } from 'src/auth/decorators/currentEmployee.decorator';
 import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
-import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 import { RequirePermission } from 'src/common/decorators/require-permission.decorator';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { CancelSaleService } from './domain/cancelSale.service';
 import { CreateSaleService } from './domain/createSale.service';
 import { SaleDataUiService } from './domain/saleDataUi.service';
 import { CreateSaleDto } from './dto/createSale.dto';
 import { SaleEntity } from './sale.entity';
+import { PermissionsRef } from '../permission/const/permissions.ref';
 
 @Crud({
   model: {
@@ -60,11 +69,12 @@ export class SaleController implements CrudController<SaleEntity> {
   constructor(
     public service: SaleDataUiService,
     private readonly createSaleService: CreateSaleService,
+    private readonly cancelSaleService: CancelSaleService,
   ) {}
 
   @Override('createOneBase')
   @Post()
-  @RequirePermission('sale_create')
+  @RequirePermission(PermissionsRef.Sale.Create.name)
   async createOne(
     @Body() dto: CreateSaleDto,
     @CurrentCompany() company: CompanyTokenPayload,
@@ -75,5 +85,14 @@ export class SaleController implements CrudController<SaleEntity> {
       company.companyUid,
       employeeUser.uid,
     );
+  }
+
+  @Patch('cancel/:id')
+  @RequirePermission(PermissionsRef.Sale.Cancel.name)
+  async cancelSale(
+    @Param('id') id: number,
+    @CurrentEmployee() employee: EmployeeTokenPayload,
+  ) {
+    return await this.cancelSaleService.execute(id, employee);
   }
 }

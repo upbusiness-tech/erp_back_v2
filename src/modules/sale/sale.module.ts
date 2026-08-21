@@ -10,6 +10,7 @@ import { CashFlowModule } from '../cashFlow/cashFlow.module';
 import { CompanyModule } from '../company/company.module';
 import { UserModule } from '../user/user.module';
 import { CreateSaleService } from './domain/createSale.service';
+import { CancelSaleService } from './domain/cancelSale.service';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { CreateSaleService } from './domain/createSale.service';
     UserModule,
   ],
   controllers: [SaleController],
-  providers: [SaleDataUiService, CreateSaleService],
+  providers: [SaleDataUiService, CreateSaleService, CancelSaleService],
   exports: [SaleDataUiService],
 })
 export class SaleModule {}

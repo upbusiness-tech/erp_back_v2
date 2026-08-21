@@ -46,6 +46,13 @@ export class SaleEntity extends BaseEntity {
   @JoinColumn({ name: 'soldByUserUid' })
   soldByUser: UserEntity;
 
+  @Column({ nullable: true })
+  canceledByUserUid: string;
+
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: 'canceledByUserUid' })
+  canceledByUser: UserEntity;
+
   @Column()
   cashFlowId: number;
 

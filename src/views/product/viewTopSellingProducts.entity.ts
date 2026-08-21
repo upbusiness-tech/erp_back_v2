@@ -17,7 +17,7 @@ import { ViewColumn, ViewEntity } from 'typeorm';
       COUNT(si.id) AS "totalSales"
     FROM sales_items si
     INNER JOIN sales s ON s.id = si."saleId"
-      AND s.status = 'Concluida'
+      AND s.status = 'Concluída'
       AND s."deletedAt" IS NULL
     INNER JOIN product_especifications pe ON pe.id = si."productEspecificationId"
     INNER JOIN products p ON p.id = si."productId"
