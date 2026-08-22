@@ -7,8 +7,8 @@ import { InternCustomerDataUiService } from './domain/internCustomerDataUi.servi
 import { UpdateInternCustomerService } from './domain/updateInternCustomer.service';
 import { InternCustomerController } from './internCustomer.controller';
 import { InternCustomerEntity } from './internCustomer.entity';
-import { InternCustomerPriceModule } from './submodules/internCustomerPrice/internCustomerPrice.module';
 import { InternCustomerPriceEntity } from './submodules/internCustomerPrice/internCustomerPrice.entity';
+import { InternCustomerPriceModule } from './submodules/internCustomerPrice/internCustomerPrice.module';
 
 @Module({
   imports: [

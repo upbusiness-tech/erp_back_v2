@@ -2,6 +2,7 @@ import { Crud, CrudAuth, CrudController, Override } from '@dataui/crud';
 import {
   Body,
   Controller,
+  Get,
   Param,
   ParseIntPipe,
   Patch,
@@ -83,6 +84,15 @@ export class InternCustomerController implements CrudController<InternCustomerEn
       company.companyUid,
       employee.uid,
     );
+  }
+
+  @Get(':id/sales-total')
+  @RequirePermission(PermissionsRef.InternCustomer.Read.name)
+  async getSalesTotal(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentCompany() company: CompanyTokenPayload,
+  ) {
+    return await this.service.getSalesTotalByCustomer(id, company.companyUid);
   }
 
   @Patch(':id')
