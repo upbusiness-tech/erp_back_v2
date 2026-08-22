@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CompanyTokenPayload } from 'src/auth/auth.types';
 import { encryptPassword } from 'src/consts/bcrypt';
+import { InvalidOperationException } from 'src/exceptions/invalidOperation.exception';
 import { ResourceNotFoundException } from 'src/exceptions/notFound.exception';
 import { PermissionEntity } from 'src/modules/permission/permission.entity';
 import { UserEntity } from 'src/modules/user/user.entity';
@@ -31,6 +32,11 @@ export class UpdateEmployeeService {
       if (!employee) {
         throw new ResourceNotFoundException('Funcionário');
       }
+
+      if (employee.isPrimaryEmployee)
+        throw new InvalidOperationException(
+          'Funcionário primário não está habilitado a sofrer atualizações.',
+        );
 
       Object.assign(employee, employeeValues);
       await transactionManager.save(EmployeeEntity, employee);

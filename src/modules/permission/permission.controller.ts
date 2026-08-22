@@ -31,7 +31,7 @@ export class PermissionController {
   ) {}
 
   @Patch('sync')
-  @RequirePermission('admin_full_acess')
+  // @RequirePermission('admin_full_acess')
   async sync() {
     await this.permissionService.syncPermissions();
   }

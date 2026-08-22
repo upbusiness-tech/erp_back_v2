@@ -33,7 +33,35 @@ export class PermissionService {
       }
     }
 
-    await this.repo.upsert(permissions, ['key']);
+    await this.repo.manager.transaction(async (entityManager) => {
+      await entityManager.upsert(PermissionEntity, permissions, ['key']);
+
+      const nonAdminPermissions = await entityManager.find(PermissionEntity, {
+        where: { isAdminPermission: false },
+      });
+
+      const primaryUsers = await entityManager.find(UserEntity, {
+        where: { employee: { isPrimaryEmployee: true } },
+        relations: { permissions: true },
+      });
+
+      for (const user of primaryUsers) {
+        const userPermissionIds = new Set(
+          user.permissions.map((permission) => permission.id),
+        );
+
+        const missingPermissions = nonAdminPermissions.filter(
+          (permission) => !userPermissionIds.has(permission.id),
+        );
+
+        if (missingPermissions.length > 0) {
+          await entityManager.save(UserEntity, {
+            ...user,
+            permissions: [...user.permissions, ...missingPermissions],
+          });
+        }
+      }
+    });
   }
 
   async findAll(): Promise<PermissionEntity[]> {

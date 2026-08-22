@@ -29,4 +29,10 @@ export const SalePermissions = {
     description: 'Permite cancelar vendas',
     isAdminPermission: false,
   },
+  ApplyInternPrice: {
+    name: 'apply_special_price',
+    displayName: 'Aplicar preço especial na venda',
+    description: 'Permite aplicar preços especiais nas vendas',
+    isAdminPermission: false,
+  },
 };
