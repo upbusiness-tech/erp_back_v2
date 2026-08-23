@@ -25,6 +25,7 @@ import { SaleEntity } from '../sale.entity';
 import { SaleStatus, SaleType } from '../sale.enum';
 import { SaleItemEntity } from '../submodules/saleItem/saleItem.entity';
 import { SalePaymentEntity } from '../submodules/salePayment/salePayment.entity';
+import { PaymentMethod } from '../submodules/salePayment/salePayment.enum';
 import { SaleServiceEntity } from '../submodules/saleService/saleService.entity';
 import {
   calculateItemLine,
@@ -243,15 +244,27 @@ export class CreateSaleService {
           },
         });
 
-        // 12. Create cash flow transaction with final total
-        await entityManager.save(CashFlowTransactionEntity, {
-          origin: TransactionOrigin.SALE,
-          saleId: saleSaved.id,
-          cashFlowId: dto.cashFlowId,
-          amount: totals.total,
-          type: TransactionType.INFLOW,
-          createdByUserUid: employeeUserUid,
-        });
+        const cashFlowTransactions: Partial<CashFlowTransactionEntity>[] = [];
+        for (const payment of payments) {
+          cashFlowTransactions.push({
+            origin: TransactionOrigin.SALE,
+            saleId: saleSaved.id,
+            cashFlowId: dto.cashFlowId,
+            amount:
+              payment.type === PaymentMethod.CASH
+                ? payment.amount - totals.change
+                : payment.amount,
+            type: TransactionType.INFLOW,
+            flowMethodType: payment.type,
+            createdByUserUid: employeeUserUid,
+            note: `Venda ${saleSaved.code} - ${payment.type}`,
+          });
+        }
+        // 12. create cash flow transaction with all the values that was inflow
+        await entityManager.save(
+          CashFlowTransactionEntity,
+          cashFlowTransactions,
+        );
       });
 
       return saleSavedToReturn;

@@ -10,6 +10,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   UseGuards,
   UseInterceptors,
@@ -21,6 +22,8 @@ import type {
 import { CurrentCompany } from 'src/auth/decorators/currentCompany.decorator';
 import { CurrentEmployee } from 'src/auth/decorators/currentEmployee.decorator';
 import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
+import { RequirePermission } from 'src/common/decorators/require-permission.decorator';
+import { PermissionsRef } from 'src/modules/permission/const/permissions.ref';
 import { CashFlowTransactionEntity } from './cashFlowTransaction.entity';
 import { CashFlowTransactionDataUiService } from './domain/cashFlowTransactionDataUi.service';
 import { CreateCashFlowTransactionService } from './domain/createCashFlowTransaction.domain';
@@ -65,5 +68,17 @@ export class CashFlowTransactionController implements CrudController<CashFlowTra
   @UseInterceptors(CrudRequestInterceptor)
   async getCashFlowTransactionStats(@ParsedRequest() req: CrudRequest) {
     return await this.viewCashFlowTransactionStatsService.getMany(req);
+  }
+
+  @Get(':id/close-stats')
+  @RequirePermission(PermissionsRef.CashFlow.Close.name)
+  async getCashFlowCloseStats(
+    @Param('id') id: number,
+    @CurrentCompany() company: CompanyTokenPayload,
+  ) {
+    return await this.service.getCashFlowStatsForClosing(
+      id,
+      company.companyUid,
+    );
   }
 }
