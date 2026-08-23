@@ -16,6 +16,7 @@ import { ProductEspecificationEntity } from './submodules/productEspecification/
 import { ProductEspecificationModule } from './submodules/productEspecification/productEspecification.module';
 import { ProductTransactionRecordsModule } from './submodules/productTransaction/productTransactionRecords.module';
 import { InternCustomerPriceEntity } from '../internCustomer/submodules/internCustomerPrice/internCustomerPrice.entity';
+import { ProductSupplierModule } from './submodules/productSupplier/productSupplier.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { InternCustomerPriceEntity } from '../internCustomer/submodules/internCu
     ProductCategoryModule,
     ProductEspecificationModule,
     ProductTransactionRecordsModule,
+    ProductSupplierModule,
     CompanyModule,
     UserModule,
   ],

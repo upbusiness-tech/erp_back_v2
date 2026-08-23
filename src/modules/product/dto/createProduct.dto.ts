@@ -53,6 +53,10 @@ export class ProductVariant {
   @IsOptional()
   code: string;
 
+  @IsString()
+  @IsOptional()
+  barcode: string;
+
   @IsNumber()
   @IsPositive()
   salePrice: number;
@@ -79,4 +83,8 @@ export class ProductVariant {
   @IsString()
   @IsOptional()
   brand: string;
+
+  @IsNumber()
+  @IsOptional()
+  productSupplierId: number;
 }

@@ -97,6 +97,7 @@ export class UpdateProductService {
                   size: v.size,
                   color: v.color,
                   brand: v.brand,
+                  productSupplierId: v.productSupplierId,
                 },
               );
             } else {

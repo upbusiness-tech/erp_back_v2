@@ -60,6 +60,10 @@ import { ProductEntity } from './product.entity';
       productEspecifications: {
         eager: true,
       },
+      'productEspecifications.productSupplier': {
+        eager: true,
+        alias: 'productSupplier',
+      },
     },
   },
 })

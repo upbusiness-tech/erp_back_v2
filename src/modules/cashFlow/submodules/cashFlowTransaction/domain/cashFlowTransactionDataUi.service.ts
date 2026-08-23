@@ -48,7 +48,7 @@ export class CashFlowTransactionDataUiService extends TypeOrmCrudService<CashFlo
 
     if (!cashFlow)
       throw new ResourceNotFoundException(
-        `Estatísticas para fechar caixa ${cashFlowId}`,
+        `Estatísticas de fechamento de caixa #${cashFlowId} não encontradas`,
       );
 
     const rows = await this.repo.manager

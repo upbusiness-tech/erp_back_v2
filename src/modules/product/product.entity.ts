@@ -15,9 +15,6 @@ export class ProductEntity extends BaseEntity {
   unitOfMeasure: ProductUnitOfMeasure;
 
   @Column({ nullable: true })
-  supplierName: string;
-
-  @Column({ nullable: true })
   productPicture: string;
 
   @Column()

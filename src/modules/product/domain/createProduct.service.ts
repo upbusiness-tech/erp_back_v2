@@ -41,6 +41,7 @@ export class CreateProductService {
       });
 
       if (!user) throw new ResourceNotFoundException('Employee user');
+
       await this.repo.manager.transaction(async (transactionEntity) => {
         const { variants, ...product } = dto;
         const productSaved = await transactionEntity.save(ProductEntity, {
