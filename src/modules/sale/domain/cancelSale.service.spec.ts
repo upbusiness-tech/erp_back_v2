@@ -24,12 +24,14 @@ const buildSale = (overrides: Partial<SaleEntity> = {}): SaleEntity =>
       {
         id: 100,
         quantitySold: 3,
+        unitSold: 1,
         productEspecificationId: 7,
         productEspecification: { id: 7, isStockControlled: true },
       },
       {
         id: 101,
         quantitySold: 5,
+        unitSold: 1,
         productEspecificationId: 8,
         productEspecification: { id: 8, isStockControlled: false },
       },
@@ -132,7 +134,7 @@ describe('CancelSaleService', () => {
     const setArg = transactionManager.queryBuilder.set.mock.calls[0][0] as {
       stockQuantity: () => string;
     };
-    expect(setArg.stockQuantity()).toBe('stockQuantity + 3');
+    expect(setArg.stockQuantity()).toBe('stockQuantity + (3 * 1)');
 
     expect(transactionManager.queryBuilder.where).toHaveBeenCalledWith(
       'id = :id',

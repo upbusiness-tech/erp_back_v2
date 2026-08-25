@@ -65,7 +65,7 @@ export class CancelSaleService {
             .createQueryBuilder()
             .update(ProductEspecificationEntity)
             .set({
-              stockQuantity: () => `stockQuantity + ${item.quantitySold}`,
+              stockQuantity: () => `stockQuantity + (${item.quantitySold} * ${item.unitSold})`,
             })
             .where('id = :id', { id: item.productEspecificationId })
             .execute();

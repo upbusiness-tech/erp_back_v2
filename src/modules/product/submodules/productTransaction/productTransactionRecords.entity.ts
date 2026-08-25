@@ -1,4 +1,5 @@
 import { BaseEntity } from 'src/common/base.entity';
+import { numericTransformer } from 'src/common/transformers';
 import { SaleEntity } from 'src/modules/sale/sale.entity';
 import { UserEntity } from 'src/modules/user/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
@@ -10,7 +11,7 @@ export class ProductTransactionRecordsEntity extends BaseEntity {
   @Column({ type: 'varchar', enum: ProductTransactionType })
   type: ProductTransactionType;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'decimal', precision: 10, scale: 3, transformer: numericTransformer })
   value: number;
 
   @Column({ nullable: true })

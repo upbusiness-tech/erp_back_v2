@@ -1,4 +1,5 @@
 import { BaseEntity } from 'src/common/base.entity';
+import { numericTransformer } from 'src/common/transformers';
 import { InternCustomerPriceEntity } from 'src/modules/internCustomer/submodules/internCustomerPrice/internCustomerPrice.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { ProductEntity } from '../../product.entity';
@@ -12,16 +13,21 @@ export class ProductEspecificationEntity extends BaseEntity {
   @Column({ nullable: true })
   barcode: string;
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'decimal', transformer: numericTransformer })
   salePrice: number;
 
-  @Column({ type: 'decimal', nullable: true })
+  @Column({ type: 'decimal', nullable: true, transformer: numericTransformer })
   costPrice: number;
 
   @Column({ type: 'boolean', default: true })
   isStockControlled: boolean;
 
-  @Column()
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 3,
+    transformer: numericTransformer,
+  })
   stockQuantity: number;
 
   @Column({ nullable: true })

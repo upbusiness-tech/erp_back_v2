@@ -12,7 +12,7 @@ export const calculateItemLine = (item: SaleItemEntity) => {
       ? item.specialPriceSnapshot
       : item.salePriceSnapshot;
 
-  const gross = round2((unitPrice ?? 0) * item.quantitySold);
+  const gross = round2((unitPrice ?? 0) * item.quantitySold * item.unitSold);
   const discount = round2(item.discountInfo?.value ?? 0);
   const net = round2(gross - discount);
 

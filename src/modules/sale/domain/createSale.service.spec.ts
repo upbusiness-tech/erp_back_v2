@@ -17,7 +17,7 @@ const mockSpec = {
   costPrice: 30,
   stockQuantity: 10,
   isStockControlled: true,
-  product: { name: 'Product A', unitOfMeasure: 'UNIT' },
+  product: { name: 'Product A', unitOfMeasure: 'Unidade' },
 };
 
 const createTransactionManager = () => ({
@@ -94,6 +94,8 @@ describe('CreateSaleService', () => {
       {
         note: undefined,
         quantitySold: 2,
+        unitSold: 1,
+        unitOfMeasure: 'Unidade' as any,
         isEspecialPrice: false,
         internCustomerPriceId: undefined,
         productId: 1,

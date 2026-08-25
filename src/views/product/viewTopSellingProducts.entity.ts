@@ -12,8 +12,8 @@ import { ViewColumn, ViewEntity } from 'typeorm';
       pe."code",
       pe."size",
       pe."color",
-      SUM(si."quantitySold") AS "totalQuantitySold",
-      SUM(si."quantitySold" * si."salePriceSnapshot") AS "totalRevenue",
+      SUM(si."quantitySold" * si."unitSold") AS "totalQuantitySold",
+      SUM(si."quantitySold" * si."unitSold" * si."salePriceSnapshot") AS "totalRevenue",
       COUNT(si.id) AS "totalSales"
     FROM sales_items si
     INNER JOIN sales s ON s.id = si."saleId"

@@ -10,6 +10,7 @@ import {
 const makeItem = (overrides: Partial<SaleItemEntity> = {}): SaleItemEntity =>
   ({
     quantitySold: 1,
+    unitSold: 1,
     isEspecialPrice: false,
     salePriceSnapshot: 100,
     specialPriceSnapshot: null,
@@ -21,7 +22,7 @@ const makeService = (
   overrides: Partial<SaleServiceEntity> = {},
 ): SaleServiceEntity =>
   ({
-    amountSnapshot: 50,
+    amount: 50,
     discount: null,
     ...overrides,
   }) as SaleServiceEntity;
@@ -110,8 +111,8 @@ describe('saleFormulas', () => {
   describe('calculateSaleServices', () => {
     it('should sum gross, discounts and net of all services', () => {
       const services = [
-        makeService({ amountSnapshot: 80, discount: { value: 15 } }),
-        makeService({ amountSnapshot: 40 }),
+        makeService({ amount: 80, discount: { value: 15 } }),
+        makeService({ amount: 40 }),
       ];
 
       const result = calculateSaleServices(services);
@@ -132,7 +133,7 @@ describe('saleFormulas', () => {
         }),
       ];
       const services = [
-        makeService({ amountSnapshot: 20, discount: { value: 2 } }),
+        makeService({ amount: 20, discount: { value: 2 } }),
       ];
       const payments = [{ type: 'CASH' as any, amount: 120 }];
 

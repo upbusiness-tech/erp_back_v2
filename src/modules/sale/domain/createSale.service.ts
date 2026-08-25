@@ -101,7 +101,7 @@ export class CreateSaleService {
         let saleAmountProfit: number = 0;
 
         // 3. Build sale items with price and product snapshots
-        const saleItems = items.map((item) => {
+        const saleItems: Partial<SaleItemEntity>[] = items.map((item) => {
           const spec = specMap.get(item.productEspecificationId);
           const specialPrice = item.isEspecialPrice
             ? (internPriceMap.get(item.internCustomerPriceId) ?? null)
@@ -113,7 +113,13 @@ export class CreateSaleService {
 
           const profit =
             ((specialPrice ? specialPrice : spec.salePrice) - spec.costPrice) *
-            item.quantitySold;
+            item.quantitySold *
+            item.unitSold;
+
+          const amountItem =
+            (specialPrice ? specialPrice : spec.salePrice) *
+            item.quantitySold *
+            item.unitSold;
 
           saleAmountProfit += profit;
 
@@ -123,6 +129,7 @@ export class CreateSaleService {
             specialPriceSnapshot: specialPrice,
             costPriceSnapshot: spec.costPrice ?? null,
             productSnapshot,
+            amountItem,
           };
         });
 
@@ -136,10 +143,8 @@ export class CreateSaleService {
         // 5. Validate stock
         for (const item of saleItems) {
           const spec = specMap.get(item.productEspecificationId);
-          if (
-            spec.isStockControlled &&
-            spec.stockQuantity < item.quantitySold
-          ) {
+          const totalNeeded = item.quantitySold * item.unitSold;
+          if (spec.isStockControlled && spec.stockQuantity < totalNeeded) {
             throw new InvalidOperationException(
               `Estoque insuficiente para a varição de produto com ID: ${spec.id}`,
             );
@@ -203,14 +208,16 @@ export class CreateSaleService {
           const spec = specMap.get(item.productEspecificationId);
           if (!spec.isStockControlled) continue;
 
+          const totalToDecrement = item.quantitySold * item.unitSold;
+
           const result = await entityManager
             .createQueryBuilder()
             .update(ProductEspecificationEntity)
             .set({
-              stockQuantity: () => `stockQuantity - ${item.quantitySold}`,
+              stockQuantity: () => `stockQuantity - ${totalToDecrement}`,
             })
             .where('id = :id', { id: spec.id })
-            .andWhere('stockQuantity >= :qty', { qty: item.quantitySold })
+            .andWhere('stockQuantity >= :qty', { qty: totalToDecrement })
             .execute();
 
           if (result.affected === 0) {
@@ -221,7 +228,7 @@ export class CreateSaleService {
 
           await entityManager.save(ProductTransactionRecordsEntity, {
             type: ProductTransactionType.SUBTRACTION,
-            value: item.quantitySold,
+            value: totalToDecrement,
             productEspecificationId: spec.id,
             createdByUserUid: employeeUserUid,
             saleId: saleSaved.id,

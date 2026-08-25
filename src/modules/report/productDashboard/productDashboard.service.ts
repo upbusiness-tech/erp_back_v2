@@ -132,9 +132,9 @@ export class ProductDashboardService {
     };
 
     const result = await this.eligibleSalesBase(params)
-      .select('COALESCE(SUM(si.quantitySold), 0)', 'unitsSold')
+      .select('COALESCE(SUM(si.quantitySold * si."unitSold"), 0)', 'unitsSold')
       .addSelect(
-        'COALESCE(SUM(si.quantitySold * (COALESCE(si.specialPriceSnapshot, si.salePriceSnapshot) - COALESCE(si.costPriceSnapshot, 0))), 0)',
+        'COALESCE(SUM(si.quantitySold * si."unitSold" * (COALESCE(si.specialPriceSnapshot, si.salePriceSnapshot) - COALESCE(si.costPriceSnapshot, 0))), 0)',
         'revenue',
       )
       .addSelect(`(${zeroStockCount.getQuery()})`, 'zeroStockProducts')
@@ -179,14 +179,14 @@ export class ProductDashboardService {
     const qb = this.eligibleSalesBase(params)
       .select('p.id', 'productId')
       .addSelect('p.name', 'productName')
-      .addSelect('SUM(si.quantitySold)', 'quantitySold')
+      .addSelect('SUM(si.quantitySold * si."unitSold")', 'quantitySold')
       .addSelect(
-        'SUM(si.quantitySold * (COALESCE(si.specialPriceSnapshot, si.salePriceSnapshot) - COALESCE(si.costPriceSnapshot, 0)))',
+        'SUM(si.quantitySold * si."unitSold" * (COALESCE(si.specialPriceSnapshot, si.salePriceSnapshot) - COALESCE(si.costPriceSnapshot, 0)))',
         'revenue',
       )
       .addSelect('COALESCE(ps."stockQuantity", 0)', 'stockQuantity')
       .addSelect(
-        'SUM(si.quantitySold) / GREATEST(COALESCE(ps."stockQuantity", 0), 1)',
+        'SUM(si.quantitySold * si."unitSold") / GREATEST(COALESCE(ps."stockQuantity", 0), 1)',
         'turnover',
       )
       .innerJoin('products', 'p', 'p.id = si.productId')
@@ -215,9 +215,9 @@ export class ProductDashboardService {
   ): Promise<ProductDashboardEntry[]> {
     const periodMetrics = this.eligibleSalesBase(params)
       .select('si.productId', 'productId')
-      .addSelect('SUM(si.quantitySold)', 'quantitySold')
+      .addSelect('SUM(si.quantitySold * si."unitSold")', 'quantitySold')
       .addSelect(
-        'SUM(si.quantitySold * (COALESCE(si.specialPriceSnapshot, si.salePriceSnapshot) - COALESCE(si.costPriceSnapshot, 0)))',
+        'SUM(si.quantitySold * si."unitSold" * (COALESCE(si.specialPriceSnapshot, si.salePriceSnapshot) - COALESCE(si.costPriceSnapshot, 0)))',
         'revenue',
       )
       .groupBy('si.productId');

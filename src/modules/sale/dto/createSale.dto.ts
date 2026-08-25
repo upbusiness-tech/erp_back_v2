@@ -12,6 +12,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+import { ProductUnitOfMeasure } from 'src/modules/product/product.enum';
 import { SaleType } from '../sale.enum';
 import { PaymentMethod } from '../submodules/salePayment/salePayment.enum';
 
@@ -39,6 +40,14 @@ export class CreateSaleItemDto {
   @IsNumber()
   @IsPositive()
   quantitySold: number;
+
+  @IsNumber()
+  @IsPositive()
+  unitSold: number;
+
+  @IsEnum(ProductUnitOfMeasure)
+  @IsNotEmpty()
+  unitOfMeasure: ProductUnitOfMeasure;
 
   @IsBoolean()
   isEspecialPrice: boolean;
