@@ -1,16 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { SaleStatus } from 'src/modules/sale/sale.enum';
-import { PRODUCT_DASHBOARD_RESTOCK_THRESHOLD } from './productDashboard.constants';
-import type { ProductDashboardQueryDto } from './dto/productDashboardQuery.dto';
 import {
   normalizeProductDashboardDateRange,
   normalizeProductDashboardLimit,
-} from './productDashboard.utils';
+} from './consts/productDashboard.utils';
 import type {
   ProductDashboardEntry,
   ProductDashboardResponse,
-} from './productDashboard.types';
+} from './consts/productDashboard.types';
+import { ProductDashboardQueryDto } from './dto/productDashboardQuery.dto';
+import { PRODUCT_DASHBOARD_RESTOCK_THRESHOLD } from './consts/productDashboard.constants';
 
 type DashboardAggregateRow = {
   productId: number | string;

@@ -11,7 +11,12 @@ export class ProductTransactionRecordsEntity extends BaseEntity {
   @Column({ type: 'varchar', enum: ProductTransactionType })
   type: ProductTransactionType;
 
-  @Column({ type: 'decimal', precision: 10, scale: 3, transformer: numericTransformer })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 3,
+    transformer: numericTransformer,
+  })
   value: number;
 
   @Column({ nullable: true })

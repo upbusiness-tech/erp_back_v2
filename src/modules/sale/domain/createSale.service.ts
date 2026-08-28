@@ -129,6 +129,7 @@ export class CreateSaleService {
             specialPriceSnapshot: specialPrice,
             costPriceSnapshot: spec.costPrice ?? null,
             productSnapshot,
+            amountProfitItem: profit,
             amountItem,
           };
         });

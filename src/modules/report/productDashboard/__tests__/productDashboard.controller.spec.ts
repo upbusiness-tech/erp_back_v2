@@ -1,10 +1,10 @@
 import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
-import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 import { PERMISSION_KEY } from 'src/common/decorators/require-permission.decorator';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 import { Role } from 'src/common/roles';
 import { PermissionsRef } from 'src/modules/permission/const/permissions.ref';
-import { ProductDashboardController } from './productDashboard.controller';
-import { ProductDashboardService } from './productDashboard.service';
+import { ProductDashboardController } from '../productDashboard.controller';
+import { ProductDashboardService } from '../productDashboard.service';
 
 describe('ProductDashboardController', () => {
   it('protects the route with employee authentication and product report permission', () => {

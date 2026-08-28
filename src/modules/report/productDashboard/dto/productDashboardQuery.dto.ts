@@ -10,7 +10,7 @@ import {
 import {
   PRODUCT_DASHBOARD_DEFAULT_LIMIT,
   PRODUCT_DASHBOARD_MAX_LIMIT,
-} from '../productDashboard.constants';
+} from '../consts/productDashboard.constants';
 
 export class ProductDashboardQueryDto {
   @IsNotEmpty()

@@ -1,3 +1,4 @@
+import type { CrudRequest } from '@dataui/crud';
 import {
   Crud,
   CrudAuth,
@@ -6,7 +7,6 @@ import {
   Override,
   ParsedRequest,
 } from '@dataui/crud';
-import type { CrudRequest } from '@dataui/crud';
 import {
   Body,
   Controller,
@@ -53,6 +53,15 @@ import { ProductEntity } from './product.entity';
   query: {
     softDelete: true,
     join: {
+      createByUser: {
+        eager: false,
+        allow: ['uid', 'employee'],
+      },
+      'createByUser.employee': {
+        eager: false,
+        allow: ['uid', 'name'],
+        alias: 'employee',
+      },
       productCategory: {
         eager: true,
         allow: ['name', 'color'],

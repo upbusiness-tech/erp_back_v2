@@ -66,6 +66,23 @@ export class SaleItemEntity extends BaseEntity {
   @Column({ type: 'jsonb', nullable: true })
   discountInfo: DiscountInfo;
 
+  @Column({
+    type: 'numeric',
+    precision: 10,
+    scale: 2,
+    transformer: numericTransformer,
+  })
+  amountItem: number;
+
+  @Column({
+    type: 'numeric',
+    precision: 10,
+    scale: 2,
+    transformer: numericTransformer,
+    nullable: true,
+  })
+  amountProfitItem: number;
+
   @Column({ nullable: true })
   internCustomerPriceId: number;
 
@@ -82,14 +99,6 @@ export class SaleItemEntity extends BaseEntity {
 
   @Column()
   productEspecificationId: number;
-
-  @Column({
-    type: 'numeric',
-    precision: 10,
-    scale: 2,
-    transformer: numericTransformer,
-  })
-  amountItem: number;
 
   @ManyToOne(() => ProductEspecificationEntity)
   @JoinColumn({ name: 'productEspecificationId' })
