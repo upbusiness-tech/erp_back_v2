@@ -7,9 +7,9 @@ import { generateUsername } from 'src/common/username';
 import { saltRounds } from 'src/consts/bcrypt';
 import { EmployeeEntity } from 'src/modules/employee/employee.entity';
 import { EmployeeType } from 'src/modules/employee/employee.enum';
-import { CreateInvoiceDto } from 'src/modules/invoice/dto/createInvoice.dto';
-import { InvoiceEntity } from 'src/modules/invoice/invoice.entity';
-import { InvoiceStatus } from 'src/modules/invoice/invoice.enum';
+import { CreateSubscriptionDto } from 'src/modules/subscription/dto/createSubscription.dto';
+import { SubscriptionEntity } from 'src/modules/subscription/subscription.entity';
+import { SubscriptionStatus } from 'src/modules/subscription/subscription.enum';
 import { UserEntity } from 'src/modules/user/user.entity';
 import { UserType } from 'src/modules/user/user.enum';
 import { EmployeeDefaultPermissions } from 'src/modules/permission/const/employee-default-permissions.ref';
@@ -113,14 +113,17 @@ export class CreateCompanyService {
 
           await transactionalEntityManager.save(UserEntity, employeeUserDto);
 
-          const firstInvoiceDto: CreateInvoiceDto = {
+          const firstSubscriptionDto: CreateSubscriptionDto = {
             companyUid: companySaved.uid,
             paidAt: null,
-            status: InvoiceStatus.PENDING,
+            status: SubscriptionStatus.PENDING,
             dueDate: getFirstPaymentDate(values.paymentDay),
           };
 
-          await transactionalEntityManager.save(InvoiceEntity, firstInvoiceDto);
+          await transactionalEntityManager.save(
+            SubscriptionEntity,
+            firstSubscriptionDto,
+          );
 
           await this.companySettingService.createDefaultUsageForCompany(
             transactionalEntityManager,

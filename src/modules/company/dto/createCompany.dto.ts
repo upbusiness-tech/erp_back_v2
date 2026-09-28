@@ -49,10 +49,6 @@ export class CreateCompanyDto {
   @IsPositive()
   paymentDay: number;
 
-  @IsString()
-  @IsOptional()
-  paymentLink: string | null;
-
   @IsNumber()
   planId: number;
 

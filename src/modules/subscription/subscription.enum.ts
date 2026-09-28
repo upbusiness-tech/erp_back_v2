@@ -1,4 +1,4 @@
-export enum InvoiceStatus {
+export enum SubscriptionStatus {
   PAID = 'Pago',
   PENDING = 'Pendente',
   LATE = 'Vencido',
