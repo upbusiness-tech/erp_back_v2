@@ -1,18 +1,16 @@
-import { Controller } from '@nestjs/common';
-import { Crud, CrudController } from '@dataui/crud';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import type { CompanyTokenPayload } from 'src/auth/auth.types';
+import { CurrentCompany } from 'src/auth/decorators/currentCompany.decorator';
+import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
 import { PlanNestCrudService } from './domain/planNestCrud.service';
-import { CreatePlanDto } from './dto/createPlan.dto';
-import { PlanEntity } from './plan.entity';
 
-@Crud({
-  model: {
-    type: PlanEntity,
-  },
-  dto: {
-    create: CreatePlanDto,
-  },
-})
 @Controller('plan')
-export class PlanController implements CrudController<PlanEntity> {
-  constructor(public service: PlanNestCrudService) {}
+@UseGuards(EmployeeAuthGuard)
+export class PlanController {
+  constructor(private readonly planService: PlanNestCrudService) {}
+
+  @Get('me')
+  async getMe(@CurrentCompany() company: CompanyTokenPayload) {
+    return await this.planService.getCompanyPlan(company.companyUid);
+  }
 }

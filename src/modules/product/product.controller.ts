@@ -66,6 +66,9 @@ import { ProductEntity } from './product.entity';
         eager: true,
         allow: ['name', 'color'],
       },
+      productFiscalClassification: {
+        eager: true,
+      },
       productEspecifications: {
         eager: true,
       },
