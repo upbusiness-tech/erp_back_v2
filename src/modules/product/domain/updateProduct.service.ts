@@ -9,6 +9,8 @@ import { ProductEntity } from '../product.entity';
 import { ProductEspecificationEntity } from '../submodules/productEspecification/productEspecification.entity';
 import { ProductTransactionRecordsEntity } from '../submodules/productTransaction/productTransactionRecords.entity';
 import { ProductTransactionType } from '../submodules/productTransaction/productTransactionRecords.enum';
+import { PlanIds } from 'src/modules/plan/plan.enum';
+import { ProductFiscalClassificationEntity } from '../submodules/productFiscalClassification/productFiscalClassification.entity';
 
 @Injectable()
 export class UpdateProductService {
@@ -28,7 +30,7 @@ export class UpdateProductService {
     employeeUserUid: string,
   ) {
     try {
-      await this.companyService.findActiveCompany(companyUid);
+      const company = await this.companyService.findActiveCompany(companyUid);
 
       await this.userService.validateEmployeeUser(employeeUserUid, companyUid);
 
@@ -39,7 +41,7 @@ export class UpdateProductService {
       if (!productFound) throw new ResourceNotFoundException('Product');
 
       await this.repo.manager.transaction(async (transactionEntity) => {
-        const { variants, ...productData } = dto;
+        const { variants, productFiscalClassification, ...productData } = dto;
 
         const existingVariants = await this.productEspecificationRepo.find({
           where: { productId },
@@ -54,6 +56,30 @@ export class UpdateProductService {
             companyUid,
           },
         );
+
+        if (
+          productFiscalClassification &&
+          company.planId === PlanIds.FISCAL.valueOf()
+        ) {
+          if (productFound.productFiscalClassificationId) {
+            await transactionEntity.update(
+              ProductFiscalClassificationEntity,
+              { id: productFound.productFiscalClassificationId },
+              productFiscalClassification,
+            );
+          } else {
+            const fiscalSaved = await transactionEntity.save(
+              ProductFiscalClassificationEntity,
+              productFiscalClassification,
+            );
+
+            await transactionEntity.update(
+              ProductEntity,
+              { id: productId },
+              { productFiscalClassificationId: fiscalSaved.id },
+            );
+          }
+        }
 
         const incomingIds = variants.filter((v) => v.id).map((v) => v.id);
 

@@ -13,6 +13,7 @@ import {
 } from 'class-validator';
 import { ProductUnitOfMeasure } from '../product.enum';
 import { Type } from 'class-transformer';
+import { CreateProductFiscalClassificationDto } from '../submodules/productFiscalClassification/dto/createProductFiscalClassification.dto';
 
 export class CreateProductDto {
   @IsString()
@@ -41,6 +42,11 @@ export class CreateProductDto {
   @ValidateNested({ each: true })
   @Type(() => ProductVariant)
   variants: ProductVariant[];
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CreateProductFiscalClassificationDto)
+  productFiscalClassification?: CreateProductFiscalClassificationDto;
 }
 
 export class ProductVariant {
