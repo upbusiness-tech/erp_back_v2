@@ -7,3 +7,9 @@ export const getFirstPaymentDate = (payday: number) => {
   );
   return dueDate;
 };
+
+export const getReferenceMonth = () => {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  return `${today.getFullYear()}-${month}`;
+};

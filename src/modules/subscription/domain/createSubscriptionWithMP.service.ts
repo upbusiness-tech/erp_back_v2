@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import { randomUUID } from 'crypto';
 import dotenv from 'dotenv';
-import { getFirstPaymentDate } from 'src/common/date';
+import { getFirstPaymentDate, getReferenceMonth } from 'src/common/date';
 import { CompanyNestCrudService } from 'src/modules/company/domain/companyNestCrud.service';
 import { Repository } from 'typeorm';
 import {
@@ -40,15 +40,15 @@ export class CreateSubscriptionWithMPService {
     });
 
     const plan = company.plan;
-    const amountAsString = plan.price.toFixed(2);
+    const amountAsString = Number(plan.price).toFixed(2);
 
-    const subscriptionInstance = this.subscriptionRepo.create();
+    const internalReference = randomUUID();
 
     const mercadoPagoPaymentBody: CreatePaymentToMercadoPago = {
       type: PAYMENT_TYPES.Online,
       total_amount: amountAsString,
       processing_mode: PROCESSING_MODE.Manual,
-      external_reference: subscriptionInstance.id.toString(),
+      external_reference: internalReference,
       payer: {
         email: company.contactEmail,
       },
@@ -62,7 +62,7 @@ export class CreateSubscriptionWithMPService {
       ],
       config: {
         online: {
-          success_url: 'https://vales-web-admin.vercel.app/',
+          success_url: 'https://erp-front-v2.vercel.app',
         },
         payment_method: {
           not_allowed_types: ['ticket'],
@@ -85,14 +85,18 @@ export class CreateSubscriptionWithMPService {
     const paymentCreatedData = paymentResult.data;
 
     const subscription = await this.subscriptionRepo.save({
-      ...subscriptionInstance,
       companyUid,
+      internalReference,
       externalId: paymentCreatedData.id,
       externalLink: paymentCreatedData.checkout_url,
       status: SubscriptionStatus.PENDING,
       dueDate: getFirstPaymentDate(company.paymentDay),
+      referenceMonth: getReferenceMonth(),
     });
 
-    return subscription;
+    return {
+      subscription,
+      mercadoPagoData: paymentCreatedData,
+    };
   }
 }

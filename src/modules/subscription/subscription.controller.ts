@@ -1,12 +1,11 @@
 import { Crud, CrudAuth, CrudController } from '@dataui/crud';
-import { Controller, UseGuards } from '@nestjs/common';
-import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
-import { RequirePermission } from 'src/common/decorators/require-permission.decorator';
-import { PermissionsGuard } from 'src/common/guards/permissions.guard';
-import { PermissionsRef } from '../permission/const/permissions.ref';
+import { Controller, Param, Post, UseGuards } from '@nestjs/common';
+import { CreateSubscriptionWithMPService } from './domain/createSubscriptionWithMP.service';
 import { SubscriptionDataUiService } from './domain/subscriptionDataUi.service';
 import { CreateSubscriptionDto } from './dto/createSubscription.dto';
 import { SubscriptionEntity } from './subscription.entity';
+import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 
 @Crud({
   model: {
@@ -17,9 +16,6 @@ import { SubscriptionEntity } from './subscription.entity';
   },
   routes: {
     exclude: ['createManyBase', 'deleteOneBase'],
-    createOneBase: {
-      decorators: [RequirePermission(PermissionsRef.Subscription.Create.name)],
-    },
   },
   query: {
     softDelete: true,
@@ -32,5 +28,13 @@ import { SubscriptionEntity } from './subscription.entity';
 @Controller('subscription')
 @UseGuards(EmployeeAuthGuard, PermissionsGuard)
 export class SubscriptionController implements CrudController<SubscriptionEntity> {
-  constructor(public service: SubscriptionDataUiService) {}
+  constructor(
+    public service: SubscriptionDataUiService,
+    private readonly createSubscriptionWithMPService: CreateSubscriptionWithMPService,
+  ) {}
+
+  @Post(':uid')
+  async createByCompany(@Param('uid') uid: string) {
+    return await this.createSubscriptionWithMPService.execute(uid);
+  }
 }

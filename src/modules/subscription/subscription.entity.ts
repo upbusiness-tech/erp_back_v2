@@ -1,9 +1,10 @@
 import { BaseEntity } from 'src/common/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, Unique } from 'typeorm';
 import { CompanyEntity } from '../company/company.entity';
 import { SubscriptionStatus } from './subscription.enum';
 
 @Entity({ name: 'subscriptions' })
+@Unique(['companyUid', 'referenceMonth'])
 export class SubscriptionEntity extends BaseEntity {
   @Column()
   dueDate: Date;
@@ -11,11 +12,14 @@ export class SubscriptionEntity extends BaseEntity {
   @Column({ type: 'varchar', enum: SubscriptionStatus })
   status: SubscriptionStatus;
 
-  @Column()
-  referenceMonth: Date;
+  @Column({ type: 'varchar', length: 7 })
+  referenceMonth: string;
 
   @Column({ nullable: true })
   paidAt: Date;
+
+  @Column({ unique: true })
+  internalReference: string;
 
   @Column({ nullable: true })
   externalId: string;
