@@ -53,10 +53,10 @@ export const SideBarPermissions = {
     description: 'Visualizar a página de configurações',
     isAdminPermission: false,
   },
-  AccessInvoicesSection: {
-    name: 'access_invoices_section',
-    displayName: 'Acessar área de configurações',
-    description: 'Visualizar a página de configurações',
+  AccessSubscriptionsSection: {
+    name: 'access_subscriptions_section',
+    displayName: 'Acessar área de mensalidades',
+    description: 'Visualizar a página de mensalidades',
     isAdminPermission: false,
   },
 };

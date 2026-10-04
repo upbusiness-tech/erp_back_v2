@@ -1,12 +1,12 @@
 import { IsDateString, IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { InvoiceStatus } from '../invoice.enum';
+import { SubscriptionStatus } from '../subscription.enum';
 
-export class CreateInvoiceDto {
+export class CreateSubscriptionDto {
   @IsDateString()
   dueDate: Date;
 
-  @IsEnum(InvoiceStatus)
-  status: InvoiceStatus;
+  @IsEnum(SubscriptionStatus)
+  status: SubscriptionStatus;
 
   @IsDateString()
   paidAt: Date | null;
