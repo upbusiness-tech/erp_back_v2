@@ -39,3 +39,24 @@ export interface CreatePaymentToMercadoPago {
     };
   };
 }
+export interface WebHookDefaultFields {
+  action: string;
+  api_version: string;
+  application_id: string;
+  data: {
+    currency_id: string;
+    external_reference: string;
+    id: string;
+    items: [];
+    status: string;
+    status_detail: string;
+    total_amount: string;
+    transactions: [];
+    type: 'online';
+    version: number;
+  };
+  date_created: string;
+  live_mode: boolean;
+  type: string;
+  user_id: string;
+}

@@ -15,7 +15,12 @@ import { PermissionsGuard } from 'src/common/guards/permissions.guard';
     create: CreateSubscriptionDto,
   },
   routes: {
-    exclude: ['createManyBase', 'deleteOneBase'],
+    exclude: [
+      'createManyBase',
+      'deleteOneBase',
+      'updateOneBase',
+      'replaceOneBase',
+    ],
   },
   query: {
     softDelete: true,

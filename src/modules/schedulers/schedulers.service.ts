@@ -8,6 +8,6 @@ export class SchedulersService {
   ) {}
 
   async createMonthlySubscription() {
-    return await this.subscriptionService.getCompanysToSubcribeToday();
+    return await this.subscriptionService.getWhoSubscrisbesSoon();
   }
 }

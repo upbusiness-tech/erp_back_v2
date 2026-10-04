@@ -1,10 +1,13 @@
 import { TypeOrmCrudService } from '@dataui/crud-typeorm';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getReferenceMonth } from 'src/common/date';
+import { differenceInCalendarDays, startOfDay } from 'date-fns';
+import { getNextDueDate, getReferenceMonthFromDate } from 'src/common/date';
 import { CompanyEntity } from 'src/modules/company/company.entity';
 import { Repository } from 'typeorm';
+import { WebHookDefaultFields } from '../resources/mercadoPago.resource';
 import { SubscriptionEntity } from '../subscription.entity';
+import { SubscriptionStatus } from '../subscription.enum';
 import { CreateSubscriptionWithMPService } from './createSubscriptionWithMP.service';
 
 @Injectable()
@@ -18,18 +21,22 @@ export class SubscriptionDataUiService extends TypeOrmCrudService<SubscriptionEn
     super(repo);
   }
 
-  async getCompanysToSubcribeToday() {
-    const companies = await this.companyRepo.find({
-      where: {
-        paymentDay: new Date().getDate(),
-      },
-    });
+  async getWhoSubscrisbesSoon() {
+    const companies = await this.companyRepo.find();
 
-    const referenceMonth = getReferenceMonth();
     const results = [];
+    const today = startOfDay(new Date());
 
     for (const company of companies) {
       try {
+        const nextDueDate = getNextDueDate(company.paymentDay);
+        const daysUntilDue = differenceInCalendarDays(nextDueDate, today);
+
+        if (daysUntilDue < 0 || daysUntilDue > 2) {
+          continue;
+        }
+
+        const referenceMonth = getReferenceMonthFromDate(nextDueDate);
         const existing = await this.repo.findOne({
           where: {
             companyUid: company.uid,
@@ -61,5 +68,28 @@ export class SubscriptionDataUiService extends TypeOrmCrudService<SubscriptionEn
     }
 
     return results;
+  }
+
+  private async markAsPaid(internalReference: string) {
+    const subscription = await this.repo.findOne({
+      where: {
+        internalReference,
+      },
+    });
+
+    await this.repo.update(subscription.id, {
+      paidAt: new Date(),
+      status: SubscriptionStatus.PAID,
+    });
+  }
+
+  async interceptPayment(webhookPayload: WebHookDefaultFields) {
+    try {
+      if (webhookPayload?.data?.status === 'processed') {
+        await this.markAsPaid(webhookPayload.data.external_reference);
+      }
+    } catch (error: any) {
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+    }
   }
 }

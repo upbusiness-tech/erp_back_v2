@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CompanyController } from './company.controller';
 import { CompanyEntity } from './company.entity';
@@ -8,12 +8,14 @@ import { CompanySettingModule } from './submodules/companySettings/companySettin
 import { ViewCompanyDetailsEntity } from 'src/views/company/viewCompanyDetails.entity';
 import { ViewCompanyDetailsService } from './domain/viewCompanyDetails.service';
 import { CompanyAuthModule } from 'src/auth/submodules/companyAuth/companyAuth.module';
+import { SubscriptionModule } from '../subscription/subscription.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([CompanyEntity, ViewCompanyDetailsEntity]),
     CompanySettingModule,
     CompanyAuthModule,
+    forwardRef(() => SubscriptionModule),
   ],
   controllers: [CompanyController],
   providers: [

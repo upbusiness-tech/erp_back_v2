@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import { randomUUID } from 'crypto';
 import dotenv from 'dotenv';
-import { getFirstPaymentDate, getReferenceMonth } from 'src/common/date';
+import { getNextDueDate, getReferenceMonthFromDate } from 'src/common/date';
 import { CompanyNestCrudService } from 'src/modules/company/domain/companyNestCrud.service';
 import { Repository } from 'typeorm';
 import {
@@ -84,14 +84,16 @@ export class CreateSubscriptionWithMPService {
 
     const paymentCreatedData = paymentResult.data;
 
+    const dueDate = getNextDueDate(company.paymentDay);
+
     const subscription = await this.subscriptionRepo.save({
       companyUid,
       internalReference,
       externalId: paymentCreatedData.id,
       externalLink: paymentCreatedData.checkout_url,
       status: SubscriptionStatus.PENDING,
-      dueDate: getFirstPaymentDate(company.paymentDay),
-      referenceMonth: getReferenceMonth(),
+      dueDate,
+      referenceMonth: getReferenceMonthFromDate(dueDate),
     });
 
     return {
