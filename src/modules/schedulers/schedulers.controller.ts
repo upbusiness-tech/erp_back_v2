@@ -9,4 +9,9 @@ export class SchedulersController {
   async createSubscription() {
     return await this.schedulersService.createMonthlySubscription();
   }
+
+  @Get('check-overdue')
+  async checkOverdue() {
+    return await this.schedulersService.checkOverdue();
+  }
 }

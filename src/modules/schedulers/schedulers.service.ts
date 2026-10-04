@@ -10,4 +10,8 @@ export class SchedulersService {
   async createMonthlySubscription() {
     return await this.subscriptionService.getWhoSubscrisbesSoon();
   }
+
+  async checkOverdue() {
+    return await this.subscriptionService.checkAndupdateOverdue();
+  }
 }

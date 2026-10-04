@@ -4,7 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { differenceInCalendarDays, startOfDay } from 'date-fns';
 import { getNextDueDate, getReferenceMonthFromDate } from 'src/common/date';
 import { CompanyEntity } from 'src/modules/company/company.entity';
-import { Repository } from 'typeorm';
+import { CompanyStatus } from 'src/modules/company/company.enum';
+import { In, LessThanOrEqual, Repository } from 'typeorm';
 import { WebHookDefaultFields } from '../resources/mercadoPago.resource';
 import { SubscriptionEntity } from '../subscription.entity';
 import { SubscriptionStatus } from '../subscription.enum';
@@ -68,6 +69,34 @@ export class SubscriptionDataUiService extends TypeOrmCrudService<SubscriptionEn
     }
 
     return results;
+  }
+
+  async checkAndupdateOverdue() {
+    await this.repo.manager.transaction(async (entityManager) => {
+      const today = startOfDay(new Date());
+      const overdue = await entityManager.find(SubscriptionEntity, {
+        where: {
+          status: SubscriptionStatus.PENDING,
+          dueDate: LessThanOrEqual(today),
+        },
+      });
+
+      await entityManager.update(
+        SubscriptionEntity,
+        {
+          id: In(overdue.map((sub) => sub.id)),
+        },
+        { status: SubscriptionStatus.LATE },
+      );
+
+      const companiesUid = overdue.map((sub) => sub.companyUid);
+
+      await entityManager.update(
+        CompanyEntity,
+        { uid: In(companiesUid) },
+        { status: CompanyStatus.DISABLED },
+      );
+    });
   }
 
   private async markAsPaid(internalReference: string) {
