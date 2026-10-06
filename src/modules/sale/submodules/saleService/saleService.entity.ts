@@ -8,6 +8,9 @@ export class SaleServiceEntity extends BaseEntity {
   @Column()
   description: string;
 
+  @Column()
+  onwerEmployee: string;
+
   @Column({ type: 'numeric', precision: 10, scale: 2 })
   amount: number;
 
