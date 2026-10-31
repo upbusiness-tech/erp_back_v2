@@ -38,6 +38,9 @@ import { PermissionsRef } from '../permission/const/permissions.ref';
       items: {
         eager: true,
       },
+      services: {
+        eager: true,
+      },
       'items.productEspecification': {
         eager: true,
         alias: 'productEspecification',

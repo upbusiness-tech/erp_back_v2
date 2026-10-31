@@ -84,6 +84,10 @@ export class CreateSaleServiceDto {
   @IsNotEmpty()
   description: string;
 
+  @IsString()
+  @IsNotEmpty()
+  onwerEmployee: string;
+
   @IsNumber()
   @IsPositive()
   amount: number;
