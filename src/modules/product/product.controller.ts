@@ -35,6 +35,7 @@ import { ViewProductExpandedDetailsService } from './domain/viewProductExpandedD
 import { ViewTopSellingProductsService } from './domain/viewTopSellingProducts.service';
 import { CreateProductDto } from './dto/createProduct.dto';
 import { ProductEntity } from './product.entity';
+import { ViewProductPictureGalleryService } from './domain/viewProductPictureGallery.service';
 
 @Crud({
   model: {
@@ -90,6 +91,7 @@ export class ProductController implements CrudController<ProductEntity> {
     public service: ProductDataUiService,
     public viewProductExpandedDetailsService: ViewProductExpandedDetailsService,
     public readonly viewTopSellingProductsService: ViewTopSellingProductsService,
+    public readonly viewProductPictureGalleryService: ViewProductPictureGalleryService,
     public readonly createProductService: CreateProductService,
     public readonly updateProductService: UpdateProductService,
   ) {}
@@ -135,5 +137,12 @@ export class ProductController implements CrudController<ProductEntity> {
   @UseInterceptors(CrudRequestInterceptor)
   async getTopSelling(@ParsedRequest() req: CrudRequest) {
     return await this.viewTopSellingProductsService.getMany(req);
+  }
+
+  @Get('gallery')
+  @RequirePermission(PermissionsRef.Product.Read.name)
+  @UseInterceptors(CrudRequestInterceptor)
+  async getGallery(@ParsedRequest() req: CrudRequest) {
+    return await this.viewProductPictureGalleryService.getMany(req);
   }
 }

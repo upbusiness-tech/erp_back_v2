@@ -17,6 +17,8 @@ import { ProductEspecificationModule } from './submodules/productEspecification/
 import { ProductTransactionRecordsModule } from './submodules/productTransaction/productTransactionRecords.module';
 import { InternCustomerPriceEntity } from '../internCustomer/submodules/internCustomerPrice/internCustomerPrice.entity';
 import { ProductSupplierModule } from './submodules/productSupplier/productSupplier.module';
+import { ViewProductPictureGalleryEntity } from 'src/views/product/viewProductPictureGallery.entity';
+import { ViewProductPictureGalleryService } from './domain/viewProductPictureGallery.service';
 
 @Module({
   imports: [
@@ -26,6 +28,7 @@ import { ProductSupplierModule } from './submodules/productSupplier/productSuppl
       ViewTopSellingProductsEntity,
       ProductEspecificationEntity,
       InternCustomerPriceEntity,
+      ViewProductPictureGalleryEntity,
     ]),
     ProductCategoryModule,
     ProductEspecificationModule,
@@ -41,6 +44,7 @@ import { ProductSupplierModule } from './submodules/productSupplier/productSuppl
     ProductDataUiService,
     ViewProductExpandedDetailsService,
     ViewTopSellingProductsService,
+    ViewProductPictureGalleryService,
   ],
 })
 export class ProductModule {}
