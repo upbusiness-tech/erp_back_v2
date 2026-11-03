@@ -3,11 +3,11 @@ import {
   PRODUCT_DASHBOARD_DEFAULT_LIMIT,
   PRODUCT_DASHBOARD_MAX_LIMIT,
   PRODUCT_DASHBOARD_MAX_RANGE_DAYS,
-} from './productDashboard.constants';
+} from '../consts/productDashboard.constants';
 import {
   normalizeProductDashboardDateRange,
   normalizeProductDashboardLimit,
-} from './productDashboard.utils';
+} from '../consts/productDashboard.utils';
 
 describe('product dashboard utils', () => {
   describe('normalizeProductDashboardDateRange', () => {

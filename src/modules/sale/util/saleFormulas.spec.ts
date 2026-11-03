@@ -1,6 +1,8 @@
 import { SaleItemEntity } from '../submodules/saleItem/saleItem.entity';
 import { SaleServiceEntity } from '../submodules/saleService/saleService.entity';
 import {
+  allocateSaleDiscountShares,
+  calculateItemAmounts,
   calculateItemLine,
   calculateSaleItems,
   calculateSaleServices,
@@ -82,6 +84,68 @@ describe('saleFormulas', () => {
 
       expect(result.gross).toBe(60);
     });
+
+    it('should use a special price of zero', () => {
+      const item = makeItem({
+        salePriceSnapshot: 60,
+        specialPriceSnapshot: 0,
+        isEspecialPrice: true,
+      });
+
+      const result = calculateItemLine(item);
+
+      expect(result.gross).toBe(0);
+    });
+  });
+
+  describe('calculateItemAmounts', () => {
+    it('should calculate net amount and profit after item discount', () => {
+      const result = calculateItemAmounts(
+        makeItem({
+          salePriceSnapshot: 50,
+          quantitySold: 2,
+          costPriceSnapshot: 30,
+          discountInfo: { value: 10 },
+        }),
+      );
+
+      expect(result).toEqual({
+        amountItem: 90,
+        costAmount: 60,
+        amountProfitItem: 30,
+      });
+    });
+
+    it('should use a zero special price instead of the regular price', () => {
+      const result = calculateItemAmounts(
+        makeItem({
+          salePriceSnapshot: 50,
+          specialPriceSnapshot: 0,
+          isEspecialPrice: true,
+          costPriceSnapshot: 30,
+        }),
+      );
+
+      expect(result.amountItem).toBe(0);
+      expect(result.amountProfitItem).toBe(-30);
+    });
+  });
+
+  describe('allocateSaleDiscountShares', () => {
+    it('should allocate the discount proportionally', () => {
+      expect(allocateSaleDiscountShares([90, 10], 20)).toEqual([18, 2]);
+    });
+
+    it('should assign rounding residual to the first largest base', () => {
+      expect(allocateSaleDiscountShares([1, 1, 1], 10)).toEqual([
+        3.34, 3.33, 3.33,
+      ]);
+    });
+
+    it('should return zero shares for zero discount or bases', () => {
+      expect(allocateSaleDiscountShares([90, 10], 0)).toEqual([0, 0]);
+      expect(allocateSaleDiscountShares([0, 0], 20)).toEqual([0, 0]);
+    });
   });
 
   describe('calculateSaleItems', () => {
@@ -132,9 +196,7 @@ describe('saleFormulas', () => {
           discountInfo: { value: 10 },
         }),
       ];
-      const services = [
-        makeService({ amount: 20, discount: { value: 2 } }),
-      ];
+      const services = [makeService({ amount: 20, discount: { value: 2 } })];
       const payments = [{ type: 'CASH' as any, amount: 120 }];
 
       const result = calculateSaleTotals(

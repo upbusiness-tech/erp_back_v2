@@ -1,7 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { SaleStatus } from 'src/modules/sale/sale.enum';
 import { DataSource } from 'typeorm';
-import { normalizeProductDashboardDateRange } from '../consts/productDashboard.utils';
+import {
+  normalizeProductDashboardDateRange,
+  productProfitSql,
+} from '../consts/productDashboard.utils';
 
 type ProductOverviewStatsParams = Record<string, unknown>;
 
@@ -43,10 +46,12 @@ export class ProductOverviewStatsService {
       toDate: toTimestampUTC(period.toExclusiveDate),
     };
 
+    // netProfit = receita líquida dos itens (frontend: "Retorno Bruto").
+    // grossProfit = lucro dos itens após descontos de linha e rateio do desconto global (frontend: "Retorno Líquido").
     const result = await this.dataSource
       .createQueryBuilder()
       .select('COALESCE(SUM(si."amountItem"), 0)', 'netProfit')
-      .addSelect('COALESCE(SUM(si."amountProfitItem"), 0)', 'grossProfit')
+      .addSelect(`COALESCE(SUM(${productProfitSql('si')}), 0)`, 'grossProfit')
       .addSelect(
         'COALESCE(SUM(si."quantitySold" * si."unitSold"), 0)',
         'unitsSold',

@@ -1,4 +1,5 @@
 import { BaseEntity } from 'src/common/base.entity';
+import { numericTransformer } from 'src/common/transformers';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { SaleEntity } from '../../sale.entity';
 import type { DiscountInfo } from '../../types/sale.types';
@@ -16,6 +17,16 @@ export class SaleServiceEntity extends BaseEntity {
 
   @Column({ type: 'jsonb', nullable: true })
   discount: DiscountInfo;
+
+  /** Parcela rateada do desconto global da venda. */
+  @Column({
+    type: 'numeric',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: numericTransformer,
+  })
+  saleDiscountShare: number;
 
   @Column()
   saleId: number;

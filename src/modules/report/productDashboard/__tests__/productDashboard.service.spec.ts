@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { ProductDashboardService } from './productDashboard.service';
+import { ProductDashboardService } from '../productDashboard.service';
 
 function createMockQueryBuilder() {
   const builder: Record<string, jest.Mock> = {
@@ -111,6 +111,12 @@ describe('ProductDashboardService', () => {
         typeof sql === 'string' && sql.includes('companyUid'),
     ) ?? [{}, {}];
     expect(companyParam).toContain('companyUid');
+
+    const selectedColumns = builder.addSelect.mock.calls
+      .map(([sql]) => String(sql))
+      .join(' ');
+    expect(selectedColumns).toContain('amountProfitItem');
+    expect(selectedColumns).toContain('saleDiscountShare');
   });
 
   it('returns zero summaries and empty rankings when no eligible sales exist', async () => {

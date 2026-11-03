@@ -1,7 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { SaleStatus } from 'src/modules/sale/sale.enum';
 import { DataSource } from 'typeorm';
-import { normalizeProductDashboardDateRange } from '../consts/productDashboard.utils';
+import {
+  normalizeProductDashboardDateRange,
+  productProfitSql,
+} from '../consts/productDashboard.utils';
 
 type TopSellingCategoriesParams = Record<string, unknown>;
 
@@ -79,10 +82,7 @@ export class TopSellingCategoriesService {
         'COALESCE(SUM(si."unitSold" * si."quantitySold"), 0)',
         'unitsSold',
       )
-      .addSelect(
-        'COALESCE(SUM(si."quantitySold" * si."unitSold" * (COALESCE(si."specialPriceSnapshot", si."salePriceSnapshot") - COALESCE(si."costPriceSnapshot", 0))), 0)',
-        'revenue',
-      )
+      .addSelect(`COALESCE(SUM(${productProfitSql('si')}), 0)`, 'revenue')
       .from('sales_items', 'si')
       .innerJoin('sales', 's', 's.id = si."saleId"')
       .innerJoin('products', 'p', 'p.id = si."productId"')

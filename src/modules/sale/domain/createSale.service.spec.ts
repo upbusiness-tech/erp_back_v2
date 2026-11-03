@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { CreateSaleDto } from '../dto/createSale.dto';
 import { SaleEntity } from '../sale.entity';
 import { SaleType } from '../sale.enum';
+import { SaleItemEntity } from '../submodules/saleItem/saleItem.entity';
 import { CreateSaleService } from './createSale.service';
 
 const mockSpec = {
@@ -46,11 +47,14 @@ const createTransactionManager = () => ({
   }),
 });
 
+let lastTransactionManager: ReturnType<typeof createTransactionManager>;
+
 const createMockRepository = (): Partial<Repository<any>> => ({
   manager: {
-    transaction: jest.fn((cb: (manager: unknown) => Promise<unknown>) =>
-      cb(createTransactionManager()),
-    ),
+    transaction: jest.fn((cb: (manager: unknown) => Promise<unknown>) => {
+      lastTransactionManager = createTransactionManager();
+      return cb(lastTransactionManager);
+    }),
   } as any,
 });
 
@@ -108,13 +112,50 @@ describe('CreateSaleService', () => {
     discount: undefined,
   });
 
-  it('should apply item line discount and compute totals', async () => {
+  it('should apply item line discount to persisted item amounts', async () => {
     const dto = buildBaseDto();
     dto.items[0].discountInfo = { value: 10 };
 
     await expect(
       service.execute(dto, 'company-1', 'user-1'),
     ).resolves.toBeDefined();
+
+    const savedItem = lastTransactionManager.save.mock.calls.find(
+      ([entityType]) => entityType === SaleItemEntity,
+    )[1][0];
+    const savedSale = lastTransactionManager.save.mock.calls.find(
+      ([entityType]) => entityType === SaleEntity,
+    )[1];
+
+    expect(savedItem).toMatchObject({
+      amountItem: 90,
+      amountProfitItem: 30,
+      saleDiscountShare: 0,
+    });
+    expect(savedSale.amountProfit).toBe(30);
+  });
+
+  it('should allocate the global sale discount separately from item profit', async () => {
+    const dto = buildBaseDto();
+    dto.items[0].discountInfo = { value: 10 };
+    dto.discount = { value: 20 };
+
+    await expect(
+      service.execute(dto, 'company-1', 'user-1'),
+    ).resolves.toBeDefined();
+
+    const savedItem = lastTransactionManager.save.mock.calls.find(
+      ([entityType]) => entityType === SaleItemEntity,
+    )[1][0];
+    const savedSale = lastTransactionManager.save.mock.calls.find(
+      ([entityType]) => entityType === SaleEntity,
+    )[1];
+
+    expect(savedItem).toMatchObject({
+      amountProfitItem: 30,
+      saleDiscountShare: 20,
+    });
+    expect(savedSale.amountProfit).toBe(10);
   });
 
   it('should reject item discount greater than line gross', async () => {

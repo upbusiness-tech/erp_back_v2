@@ -9,6 +9,13 @@ import type { ProductDashboardDateRange } from './productDashboard.types';
 const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 
+export function productProfitSql(alias = 'si'): string {
+  return `(COALESCE(${alias}."amountProfitItem",
+    ${alias}."quantitySold" * ${alias}."unitSold" *
+      (COALESCE(${alias}."specialPriceSnapshot", ${alias}."salePriceSnapshot") - COALESCE(${alias}."costPriceSnapshot", 0))
+  ) - COALESCE(${alias}."saleDiscountShare", 0))`;
+}
+
 export function normalizeProductDashboardDateRange(
   from: unknown,
   to: unknown,

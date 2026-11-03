@@ -66,6 +66,7 @@ export class SaleItemEntity extends BaseEntity {
   @Column({ type: 'jsonb', nullable: true })
   discountInfo: DiscountInfo;
 
+  /** Valor líquido da linha (bruto - desconto do item). */
   @Column({
     type: 'numeric',
     precision: 10,
@@ -74,6 +75,7 @@ export class SaleItemEntity extends BaseEntity {
   })
   amountItem: number;
 
+  /** Lucro da linha após desconto do item e custo, antes do rateio do desconto global. */
   @Column({
     type: 'numeric',
     precision: 10,
@@ -82,6 +84,16 @@ export class SaleItemEntity extends BaseEntity {
     nullable: true,
   })
   amountProfitItem: number;
+
+  /** Parcela rateada do desconto global da venda. */
+  @Column({
+    type: 'numeric',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: numericTransformer,
+  })
+  saleDiscountShare: number;
 
   @Column({ nullable: true })
   internCustomerPriceId: number;

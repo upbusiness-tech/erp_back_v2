@@ -4,19 +4,64 @@ import { SaleEntity } from '../sale.entity';
 import { SaleItemEntity } from '../submodules/saleItem/saleItem.entity';
 import { SaleServiceEntity } from '../submodules/saleService/saleService.entity';
 
-const round2 = (value: number): number => Math.round(value * 100) / 100;
+export const round2 = (value: number): number => Math.round(value * 100) / 100;
+
+export const resolveItemUnitPrice = (item: SaleItemEntity): number =>
+  item.isEspecialPrice && item.specialPriceSnapshot != null
+    ? item.specialPriceSnapshot
+    : item.salePriceSnapshot;
 
 export const calculateItemLine = (item: SaleItemEntity) => {
-  const unitPrice =
-    item.isEspecialPrice && item.specialPriceSnapshot != null
-      ? item.specialPriceSnapshot
-      : item.salePriceSnapshot;
+  const unitPrice = resolveItemUnitPrice(item);
 
   const gross = round2((unitPrice ?? 0) * item.quantitySold * item.unitSold);
   const discount = round2(item.discountInfo?.value ?? 0);
   const net = round2(gross - discount);
 
   return { gross, discount, net };
+};
+
+export const calculateItemAmounts = (item: SaleItemEntity) => {
+  const amountItem = calculateItemLine(item).net;
+  const costAmount = round2(
+    (item.costPriceSnapshot ?? 0) * item.quantitySold * item.unitSold,
+  );
+  const amountProfitItem = round2(amountItem - costAmount);
+
+  return { amountItem, costAmount, amountProfitItem };
+};
+
+export const allocateSaleDiscountShares = (
+  bases: number[],
+  saleDiscount: number,
+): number[] => {
+  const normalizedBases = bases.map((base) => round2(base));
+  const normalizedDiscount = round2(saleDiscount);
+  const totalBase = round2(
+    normalizedBases.reduce((total, base) => total + base, 0),
+  );
+
+  if (normalizedDiscount <= 0 || totalBase <= 0) {
+    return normalizedBases.map(() => 0);
+  }
+
+  const shares = normalizedBases.map((base) =>
+    round2((normalizedDiscount * base) / totalBase),
+  );
+  const residual = round2(
+    normalizedDiscount - shares.reduce((total, share) => total + share, 0),
+  );
+
+  if (residual !== 0) {
+    const largestBaseIndex = normalizedBases.reduce(
+      (largestIndex, base, index) =>
+        base > normalizedBases[largestIndex] ? index : largestIndex,
+      0,
+    );
+    shares[largestBaseIndex] = round2(shares[largestBaseIndex] + residual);
+  }
+
+  return shares;
 };
 
 export const calculateSaleItems = (items: SaleItemEntity[]) => {

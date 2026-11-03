@@ -4,6 +4,7 @@ import { SaleStatus } from 'src/modules/sale/sale.enum';
 import {
   normalizeProductDashboardDateRange,
   normalizeProductDashboardLimit,
+  productProfitSql,
 } from './consts/productDashboard.utils';
 import type {
   ProductDashboardEntry,
@@ -133,10 +134,7 @@ export class ProductDashboardService {
 
     const result = await this.eligibleSalesBase(params)
       .select('COALESCE(SUM(si.quantitySold * si."unitSold"), 0)', 'unitsSold')
-      .addSelect(
-        'COALESCE(SUM(si.quantitySold * si."unitSold" * (COALESCE(si.specialPriceSnapshot, si.salePriceSnapshot) - COALESCE(si.costPriceSnapshot, 0))), 0)',
-        'revenue',
-      )
+      .addSelect(`COALESCE(SUM(${productProfitSql('si')}), 0)`, 'revenue')
       .addSelect(`(${zeroStockCount.getQuery()})`, 'zeroStockProducts')
       .innerJoin('products', 'p', 'p.id = si.productId')
       .andWhere('p.companyUid = :companyUid', {
@@ -180,10 +178,7 @@ export class ProductDashboardService {
       .select('p.id', 'productId')
       .addSelect('p.name', 'productName')
       .addSelect('SUM(si.quantitySold * si."unitSold")', 'quantitySold')
-      .addSelect(
-        'SUM(si.quantitySold * si."unitSold" * (COALESCE(si.specialPriceSnapshot, si.salePriceSnapshot) - COALESCE(si.costPriceSnapshot, 0)))',
-        'revenue',
-      )
+      .addSelect(`SUM(${productProfitSql('si')})`, 'revenue')
       .addSelect('COALESCE(ps."stockQuantity", 0)', 'stockQuantity')
       .addSelect(
         'SUM(si.quantitySold * si."unitSold") / GREATEST(COALESCE(ps."stockQuantity", 0), 1)',
@@ -216,10 +211,7 @@ export class ProductDashboardService {
     const periodMetrics = this.eligibleSalesBase(params)
       .select('si.productId', 'productId')
       .addSelect('SUM(si.quantitySold * si."unitSold")', 'quantitySold')
-      .addSelect(
-        'SUM(si.quantitySold * si."unitSold" * (COALESCE(si.specialPriceSnapshot, si.salePriceSnapshot) - COALESCE(si.costPriceSnapshot, 0)))',
-        'revenue',
-      )
+      .addSelect(`SUM(${productProfitSql('si')})`, 'revenue')
       .groupBy('si.productId');
 
     const productStock = this.productStockQuery(params);

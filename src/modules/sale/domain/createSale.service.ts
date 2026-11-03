@@ -28,9 +28,12 @@ import { SalePaymentEntity } from '../submodules/salePayment/salePayment.entity'
 import { PaymentMethod } from '../submodules/salePayment/salePayment.enum';
 import { SaleServiceEntity } from '../submodules/saleService/saleService.entity';
 import {
+  allocateSaleDiscountShares,
+  calculateItemAmounts,
   calculateItemLine,
   calculateSaleTotals,
   calculateServiceLine,
+  round2,
 } from '../util/saleFormulas';
 
 const CODE_LENGTH = 6;
@@ -98,8 +101,6 @@ export class CreateSaleService {
           internPrices.map((p) => [p.id, p.specialPrice]),
         );
 
-        let saleAmountProfit: number = 0;
-
         // 3. Build sale items with price and product snapshots
         const saleItems: Partial<SaleItemEntity>[] = items.map((item) => {
           const spec = specMap.get(item.productEspecificationId);
@@ -111,17 +112,14 @@ export class CreateSaleService {
             ...spec,
           };
 
-          const profit =
-            ((specialPrice ? specialPrice : spec.salePrice) - spec.costPrice) *
-            item.quantitySold *
-            item.unitSold;
-
-          const amountItem =
-            (specialPrice ? specialPrice : spec.salePrice) *
-            item.quantitySold *
-            item.unitSold;
-
-          saleAmountProfit += profit;
+          const itemCalculation = {
+            ...item,
+            salePriceSnapshot: spec.salePrice,
+            specialPriceSnapshot: specialPrice,
+            costPriceSnapshot: spec.costPrice ?? null,
+          } as SaleItemEntity;
+          const { amountItem, amountProfitItem } =
+            calculateItemAmounts(itemCalculation);
 
           return {
             ...item,
@@ -129,7 +127,7 @@ export class CreateSaleService {
             specialPriceSnapshot: specialPrice,
             costPriceSnapshot: spec.costPrice ?? null,
             productSnapshot,
-            amountProfitItem: profit,
+            amountProfitItem,
             amountItem,
           };
         });
@@ -161,6 +159,33 @@ export class CreateSaleService {
         );
 
         this.validateSaleFinancials(saleItems, saleServices, totals);
+
+        const itemBases = saleItems.map(
+          (item) => calculateItemLine(item as SaleItemEntity).net,
+        );
+        const serviceBases = saleServices.map(
+          (service) => calculateServiceLine(service as SaleServiceEntity).net,
+        );
+        const discountShares = allocateSaleDiscountShares(
+          [...itemBases, ...serviceBases],
+          totals.saleDiscount,
+        );
+        const itemDiscountShares = discountShares.slice(0, itemBases.length);
+        const serviceDiscountShares = discountShares.slice(itemBases.length);
+
+        saleItems.forEach((item, index) => {
+          item.saleDiscountShare = itemDiscountShares[index] ?? 0;
+        });
+
+        const saleAmountProfit = round2(
+          saleItems.reduce(
+            (acc, item) =>
+              acc +
+              (item.amountProfitItem ?? 0) -
+              (item.saleDiscountShare ?? 0),
+            0,
+          ),
+        );
 
         // 7. Generate sale code
         const [{ lastNumber }] = await entityManager.query(
@@ -200,7 +225,11 @@ export class CreateSaleService {
         if (saleSaved.type === SaleType.SERVICE && saleServices.length > 0) {
           await entityManager.save(
             SaleServiceEntity,
-            saleServices.map((s) => ({ ...s, saleId: saleSaved.id })),
+            saleServices.map((s, index) => ({
+              ...s,
+              saleDiscountShare: serviceDiscountShares[index] ?? 0,
+              saleId: saleSaved.id,
+            })),
           );
         }
 
