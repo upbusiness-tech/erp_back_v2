@@ -13,10 +13,14 @@ async function bootstrap() {
     'http://localhost:8080',
   ];
 
-  const corsOriginsEnv = process.env.CORS_ORIGINS;
-  const origins = corsOriginsEnv
-    ? [...localhostOrigins, ...corsOriginsEnv.split(',').map((o) => o.trim())]
-    : localhostOrigins;
+  const configuredOrigins = (process.env.CORS_ORIGINS ?? '')
+    .split(',')
+    .map((origin) => origin.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
+  const origins = [
+    ...(process.env.NODE_ENV !== 'production' ? localhostOrigins : []),
+    ...configuredOrigins,
+  ].filter((origin, index, allOrigins) => allOrigins.indexOf(origin) === index);
 
   app.enableCors({
     origin: origins,

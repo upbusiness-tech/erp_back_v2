@@ -70,6 +70,16 @@ $ mau deploy
 
 With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
 
+## Deploy e ambientes
+
+Consulte o [guia de deploy no Cloud Run](docs/deploy-cloud-run.md) para o
+fluxo completo. Use `make help` para listar os comandos e `ENV=staging` ou
+`ENV=production` para escolher o ambiente.
+
+Para criar uma migration, use `npm run migration:create --name=...` e depois
+`make migrate ENV=...`. Para rotacionar as variáveis de ambiente, use
+`make env ENV=...`.
+
 ## Resources
 
 Check out a few resources that may come in handy when working with NestJS:

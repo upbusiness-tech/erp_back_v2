@@ -2,7 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { config } from 'dotenv';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
-config();
+config({ path: process.env.DOTENV_CONFIG_PATH ?? '.env' });
 
 const configService = new ConfigService();
 
@@ -15,7 +15,10 @@ const dataSourceOptions: DataSourceOptions = {
   database: configService.get<string>('DB_NAME'),
   entities: [],
   migrations: [__dirname + '/migrations/*.ts'],
-  synchronize: true,
+  synchronize: false,
+  ...(configService.get('DB_SSL') === 'true' && {
+    ssl: { rejectUnauthorized: false },
+  }),
 };
 
 export default new DataSource(dataSourceOptions);

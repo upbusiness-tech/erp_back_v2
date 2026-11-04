@@ -20,15 +20,17 @@ import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './exceptions/handler/allExceptions.handler';
 import { HealthModule } from './health/health.module';
 import { SchedulersModule } from './modules/schedulers/schedulers.module';
+import { validateEnv } from './config/env.validation';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validate: validateEnv,
+    }),
     DbModule,
     AuthModule,
     PermissionModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
     JwtModule.register({ global: true }),
     CompanyModule,
     PlanModule,
