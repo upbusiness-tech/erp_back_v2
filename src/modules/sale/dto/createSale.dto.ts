@@ -10,6 +10,7 @@ import {
   IsPositive,
   IsString,
   Min,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { ProductUnitOfMeasure } from 'src/modules/product/product.enum';
@@ -109,11 +110,12 @@ export class CreateSaleDto {
   @IsNumber()
   cashFlowId: number;
 
+  @ValidateIf((sale: CreateSaleDto) => sale.type !== SaleType.SERVICE)
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => CreateSaleItemDto)
-  items: CreateSaleItemDto[];
+  items?: CreateSaleItemDto[];
 
   @IsArray()
   @ArrayMinSize(1)

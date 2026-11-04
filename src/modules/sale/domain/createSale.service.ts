@@ -66,8 +66,9 @@ export class CreateSaleService {
       let saleSavedToReturn: Partial<SaleEntity>;
 
       await this.repo.manager.transaction(async (entityManager) => {
-        const { items, payments, services, ...saleValues } = dto;
+        const { items: itemsDto, payments, services, ...saleValues } = dto;
 
+        const items = itemsDto ?? [];
         const saleServices = services ?? [];
 
         // 1. Load product specifications with products
