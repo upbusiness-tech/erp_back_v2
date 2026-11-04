@@ -1,9 +1,9 @@
+import { Crud, CrudController } from '@dataui/crud';
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import type { CompanyTokenPayload } from 'src/auth/auth.types';
 import { CurrentCompany } from 'src/auth/decorators/currentCompany.decorator';
-import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
+import { AdminAuthGuard } from 'src/auth/guards/adminAuth.guard';
 import { PlanNestCrudService } from './domain/planNestCrud.service';
-import { Crud, CrudController } from '@dataui/crud';
 import { PlanEntity } from './plan.entity';
 
 @Crud({
@@ -20,7 +20,7 @@ import { PlanEntity } from './plan.entity';
   },
 })
 @Controller('plan')
-@UseGuards(EmployeeAuthGuard)
+@UseGuards(AdminAuthGuard)
 export class PlanController implements CrudController<PlanEntity> {
   constructor(public service: PlanNestCrudService) {}
 

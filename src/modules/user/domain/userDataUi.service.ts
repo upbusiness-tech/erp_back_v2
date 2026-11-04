@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../user.entity';
 import { UserType } from '../user.enum';
+import { encryptPassword } from 'src/consts/bcrypt';
 
 @Injectable()
 export class UserDataUiService extends TypeOrmCrudService<UserEntity> {
@@ -38,5 +39,12 @@ export class UserDataUiService extends TypeOrmCrudService<UserEntity> {
     }
 
     return user.employee;
+  }
+
+  async createAdminUser(user: Partial<UserEntity>) {
+    await this.repo.save({
+      ...user,
+      password: await encryptPassword(user.password),
+    });
   }
 }

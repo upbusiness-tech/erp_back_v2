@@ -6,9 +6,8 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Role } from 'src/common/roles';
 import { firebaseAuth } from 'src/config/firebase/firebase.config';
-import { AdminTokenPayload, EmployeeTokenPayload } from '../auth.types';
+import { EmployeeTokenPayload } from '../auth.types';
 
 @Injectable()
 export class EmployeeAuthGuard implements CanActivate {
@@ -27,9 +26,6 @@ export class EmployeeAuthGuard implements CanActivate {
     if (!employeeAccessToken)
       throw new UnauthorizedException('Employee access token missed');
 
-    // const adminTokenResult = this.tryAdminToken(request, employeeAccessToken);
-    // if (adminTokenResult) return true;
-
     const employeeTokenResult = await this.tryEmployeeToken(
       request,
       employeeAccessToken,
@@ -37,41 +33,6 @@ export class EmployeeAuthGuard implements CanActivate {
     if (employeeTokenResult) return true;
 
     throw new UnauthorizedException('Token funcionário inválido');
-  }
-
-  private tryAdminToken(request: any, token: string): boolean {
-    try {
-      const adminPayload = this.jwtService.verify<AdminTokenPayload>(token, {
-        secret: this.configService.get('JWT_ADMIN_SECRET'),
-      });
-
-      if (adminPayload.role !== Role.ADMIN) return false;
-
-      const companyUid = request.headers['x-company-token'] as string;
-      if (!companyUid) {
-        throw new UnauthorizedException(
-          'Header x-company-token é obrigatório para admin',
-        );
-      }
-
-      request.employee = adminPayload;
-      request.company = {
-        companyUid,
-        role: Role.ADMIN,
-        plan: 0,
-        permissions: [],
-      };
-      request.user = {
-        uid: adminPayload.uid,
-        role: Role.ADMIN,
-        companyUid,
-        permissions: adminPayload.permissions,
-        isAdmin: true,
-      };
-      return true;
-    } catch {
-      return false;
-    }
   }
 
   private async tryEmployeeToken(

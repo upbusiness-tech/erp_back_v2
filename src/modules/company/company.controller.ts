@@ -12,6 +12,7 @@ import { ViewCompanyDetailsService } from './domain/viewCompanyDetails.service';
 import { UpdateCompanyDto } from './dto/updateCompany.dto';
 import { RequirePermission } from 'src/common/decorators/require-permission.decorator';
 import { PermissionsRef } from '../permission/const/permissions.ref';
+import { AdminAuthGuard } from 'src/auth/guards/adminAuth.guard';
 
 @Crud({
   model: {
@@ -49,6 +50,7 @@ export class CompanyController implements CrudController<CompanyEntity> {
 
   @Post()
   @Override('createOneBase')
+  @UseGuards(AdminAuthGuard)
   async createOne(@Body() dto: CreateCompanyDto) {
     await this.createCompanyService.execute(dto);
   }

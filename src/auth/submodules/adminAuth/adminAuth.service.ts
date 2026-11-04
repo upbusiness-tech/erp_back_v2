@@ -55,7 +55,7 @@ export class AdminAuthService {
 
       return {
         accessToken: this.jwtService.sign(payload, {
-          expiresIn: '12h',
+          expiresIn: '24h',
           secret: this.configService.get('JWT_ADMIN_SECRET'),
         }),
         permissions,
