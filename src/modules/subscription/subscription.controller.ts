@@ -6,6 +6,7 @@ import { CreateSubscriptionDto } from './dto/createSubscription.dto';
 import { SubscriptionEntity } from './subscription.entity';
 import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
 import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { AdminAuthGuard } from 'src/auth/guards/adminAuth.guard';
 
 @Crud({
   model: {
@@ -39,6 +40,7 @@ export class SubscriptionController implements CrudController<SubscriptionEntity
   ) {}
 
   @Post(':uid')
+  @UseGuards(AdminAuthGuard)
   async createByCompany(@Param('uid') uid: string) {
     return await this.createSubscriptionWithMPService.execute(uid);
   }

@@ -9,6 +9,7 @@ export enum PROCESSING_MODE {
 export enum EXPIRATION_TIME {
   ONE_DAY = 'P1D',
   ONE_WEEK = 'P7D',
+  ONE_MONTH = 'P30D',
 }
 
 export type PaymentItemMercadoPago = {

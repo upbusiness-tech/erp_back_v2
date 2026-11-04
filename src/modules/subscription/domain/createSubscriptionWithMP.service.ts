@@ -52,7 +52,7 @@ export class CreateSubscriptionWithMPService {
       payer: {
         email: company.contactEmail,
       },
-      expiration_time: EXPIRATION_TIME.ONE_WEEK,
+      expiration_time: EXPIRATION_TIME.ONE_MONTH,
       items: [
         {
           title: plan.name,
@@ -62,7 +62,7 @@ export class CreateSubscriptionWithMPService {
       ],
       config: {
         online: {
-          success_url: 'https://erp-front-v2.vercel.app',
+          success_url: 'https://www.uperp.online/',
         },
         payment_method: {
           not_allowed_types: ['ticket'],
