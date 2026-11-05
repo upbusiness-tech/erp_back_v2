@@ -28,7 +28,6 @@ export class CompanySettingService extends TypeOrmCrudService<CompanySettingEnti
           key: def.key,
           description: def.description,
           default: def.defaultActive,
-          planId: def.plan,
         })),
     );
 
@@ -50,14 +49,6 @@ export class CompanySettingService extends TypeOrmCrudService<CompanySettingEnti
     const newUsage: Partial<CompanySettingUsageEntity>[] = [];
     for (const company of companies) {
       for (const def of currentDefs) {
-        const defWithPlan = allSettingDefs.find((d) => d.key === def.key);
-        if (
-          defWithPlan?.planId &&
-          company.planId !== defWithPlan.planId.valueOf()
-        ) {
-          continue;
-        }
-
         const key = `${company.uid}:${def.id}`;
         if (usageKeySet.has(key)) continue;
 
@@ -81,17 +72,14 @@ export class CompanySettingService extends TypeOrmCrudService<CompanySettingEnti
   async createDefaultUsageForCompany(
     entityManager: EntityManager,
     companyUid: string,
-    planId: number,
   ): Promise<void> {
     const defs = await entityManager.find(CompanySettingEntity);
 
-    const usage = defs
-      .filter((d) => d.planId === planId)
-      .map((d) => ({
-        isActive: d.default,
-        companyUid,
-        companySettingId: d.id,
-      }));
+    const usage = defs.map((d) => ({
+      isActive: d.default,
+      companyUid,
+      companySettingId: d.id,
+    }));
 
     if (usage.length > 0) {
       await entityManager.insert(CompanySettingUsageEntity, usage);

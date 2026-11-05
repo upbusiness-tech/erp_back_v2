@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ResourceNotFoundException } from 'src/exceptions/notFound.exception';
 import { CompanyNestCrudService } from 'src/modules/company/domain/companyNestCrud.service';
@@ -25,6 +25,7 @@ export class CreateProductService {
     companyUid: string,
     employeeUserUid: string,
   ) {
+    // eslint-disable-next-line no-useless-catch
     try {
       const companyFound = await this.companyService.findOne({
         where: {
@@ -78,8 +79,10 @@ export class CreateProductService {
           }),
         );
       });
-    } catch (error: any) {
-      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+    } catch (error: unknown) {
+      // Mantém o erro original para o AllExceptionsFilter classificar
+      // corretamente (ex.: violação de unicidade 23505 -> 409).
+      throw error;
     }
   }
 }

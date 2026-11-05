@@ -1,5 +1,4 @@
 import {
-  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsEnum,
@@ -38,7 +37,6 @@ export class CreateProductDto {
   productCategoryId: number;
 
   @IsArray()
-  @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => ProductVariant)
   variants: ProductVariant[];

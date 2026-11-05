@@ -34,6 +34,7 @@ import { UpdateProductService } from './domain/updateProduct.service';
 import { ViewProductExpandedDetailsService } from './domain/viewProductExpandedDetails.service';
 import { ViewTopSellingProductsService } from './domain/viewTopSellingProducts.service';
 import { CreateProductDto } from './dto/createProduct.dto';
+import { UpdateProductDto } from './dto/updateProduct.dto';
 import { ProductEntity } from './product.entity';
 import { ViewProductPictureGalleryService } from './domain/viewProductPictureGallery.service';
 
@@ -43,7 +44,7 @@ import { ViewProductPictureGalleryService } from './domain/viewProductPictureGal
   },
   dto: {
     create: CreateProductDto,
-    update: CreateProductDto,
+    update: UpdateProductDto,
   },
   routes: {
     exclude: ['createManyBase', 'updateOneBase'],
@@ -115,7 +116,7 @@ export class ProductController implements CrudController<ProductEntity> {
   @RequirePermission(PermissionsRef.Product.Update.name)
   async updateOne(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: CreateProductDto,
+    @Body() dto: UpdateProductDto,
     @CurrentCompany() company: CompanyTokenPayload,
     @CurrentEmployee() employee: EmployeeTokenPayload,
   ) {

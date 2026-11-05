@@ -15,4 +15,11 @@ export const ProductSetting = {
     defaultActive: true,
     plan: PlanIds.GESTOR,
   },
+  ViewProductOnExpandedMode: {
+    module: 'Product',
+    key: 'view_product_on_expanded_mode',
+    description: 'Visualizar produtos em modo expandido',
+    defaultActive: false,
+    plan: PlanIds.GESTOR,
+  },
 };

@@ -8,6 +8,7 @@ import { EmployeeEntity } from 'src/modules/employee/employee.entity';
 import { EmployeeType } from 'src/modules/employee/employee.enum';
 import { EmployeeDefaultPermissions } from 'src/modules/permission/const/employee-default-permissions.ref';
 import { PermissionEntity } from 'src/modules/permission/permission.entity';
+import { CreateSubscriptionWithMPService } from 'src/modules/subscription/domain/createSubscriptionWithMP.service';
 import { UserEntity } from 'src/modules/user/user.entity';
 import { UserType } from 'src/modules/user/user.enum';
 import { In, Repository } from 'typeorm';
@@ -16,7 +17,6 @@ import { CompanyStatus } from '../company.enum';
 import { CreateCompanyDto } from '../dto/createCompany.dto';
 import { CompanySettingService } from '../submodules/companySettings/domain/companySetting.service';
 import { CompanyNestCrudService } from './companyNestCrud.service';
-import { CreateSubscriptionWithMPService } from 'src/modules/subscription/domain/createSubscriptionWithMP.service';
 
 @Injectable()
 export class CreateCompanyService {
@@ -115,7 +115,6 @@ export class CreateCompanyService {
           await this.companySettingService.createDefaultUsageForCompany(
             transactionalEntityManager,
             companySaved.uid,
-            companySaved.planId,
           );
         },
       );
