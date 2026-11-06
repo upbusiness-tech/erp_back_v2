@@ -20,9 +20,9 @@ import { ProductTransactionRecordsEntity } from 'src/modules/product/submodules/
 import { ProductTransactionType } from 'src/modules/product/submodules/productTransaction/productTransactionRecords.enum';
 import { UserDataUiService } from 'src/modules/user/domain/userDataUi.service';
 import { In, Repository } from 'typeorm';
-import { CreateSaleDto } from '../dto/createSale.dto';
+import { CreateSaleDto, CreateSaleItemDto } from '../dto/createSale.dto';
 import { SaleEntity } from '../sale.entity';
-import { SaleStatus, SaleType } from '../sale.enum';
+import { SaleStatus, SaleType, SpecialPriceSource } from '../sale.enum';
 import { SaleItemEntity } from '../submodules/saleItem/saleItem.entity';
 import { SalePaymentEntity } from '../submodules/salePayment/salePayment.entity';
 import { PaymentMethod } from '../submodules/salePayment/salePayment.enum';
@@ -71,6 +71,9 @@ export class CreateSaleService {
         const items = itemsDto ?? [];
         const saleServices = services ?? [];
 
+        this.validateSaleCustomer(saleValues);
+        items.forEach((item) => this.validateItemPricing(item, saleValues));
+
         // 1. Load product specifications with products
         const specIds = items.map((i) => i.productEspecificationId);
         const specs = await entityManager.find(ProductEspecificationEntity, {
@@ -89,7 +92,7 @@ export class CreateSaleService {
 
         // 2. Load internal customer prices when applicable
         const internPriceIds = items
-          .filter((i) => i.isEspecialPrice && i.internCustomerPriceId)
+          .filter((i) => i.internCustomerPriceId != null)
           .map((i) => i.internCustomerPriceId);
 
         const internPrices =
@@ -105,16 +108,23 @@ export class CreateSaleService {
         // 3. Build sale items with price and product snapshots
         const saleItems: Partial<SaleItemEntity>[] = items.map((item) => {
           const spec = specMap.get(item.productEspecificationId);
-          const specialPrice = item.isEspecialPrice
-            ? (internPriceMap.get(item.internCustomerPriceId) ?? null)
-            : null;
+          const itemFields: CreateSaleItemDto = { ...item };
+          delete itemFields.specialPrice;
+          const specialPrice = this.resolveItemSpecialPrice(
+            item,
+            internPriceMap,
+          );
+          const specialPriceSource = this.resolveItemSpecialPriceSource(item);
+          const isEspecialPrice = specialPrice != null;
 
           const productSnapshot: Partial<ProductEspecificationEntity> = {
             ...spec,
           };
 
           const itemCalculation = {
-            ...item,
+            ...itemFields,
+            isEspecialPrice,
+            specialPriceSource,
             salePriceSnapshot: spec.salePrice,
             specialPriceSnapshot: specialPrice,
             costPriceSnapshot: spec.costPrice ?? null,
@@ -123,7 +133,9 @@ export class CreateSaleService {
             calculateItemAmounts(itemCalculation);
 
           return {
-            ...item,
+            ...itemFields,
+            isEspecialPrice,
+            specialPriceSource,
             salePriceSnapshot: spec.salePrice,
             specialPriceSnapshot: specialPrice,
             costPriceSnapshot: spec.costPrice ?? null,
@@ -309,6 +321,71 @@ export class CreateSaleService {
     } catch (error) {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  private validateSaleCustomer(saleValues: Partial<CreateSaleDto>) {
+    if (
+      saleValues.internCustomerId != null &&
+      saleValues.isolatedCustomer != null
+    ) {
+      throw new BadRequestException(
+        'Não é permitido informar cliente cadastrado e cliente avulso na mesma venda',
+      );
+    }
+  }
+
+  private validateItemPricing(
+    item: CreateSaleItemDto,
+    saleValues: Partial<CreateSaleDto>,
+  ) {
+    if (item.specialPrice != null && item.internCustomerPriceId != null) {
+      throw new BadRequestException(
+        'Informe preço negociado ou preço especial de cliente, não ambos',
+      );
+    }
+
+    if (item.specialPrice != null && saleValues.internCustomerId != null) {
+      throw new BadRequestException(
+        'Preço negociado só é permitido em vendas sem cliente cadastrado',
+      );
+    }
+
+    if (item.specialPrice != null && item.specialPrice <= 0) {
+      throw new BadRequestException('Preço negociado deve ser maior que zero');
+    }
+  }
+
+  private resolveItemSpecialPrice(
+    item: CreateSaleItemDto,
+    internPriceMap: Map<number, number>,
+  ): number | null {
+    if (item.specialPrice != null) {
+      return item.specialPrice;
+    }
+
+    if (item.internCustomerPriceId != null) {
+      const specialPrice = internPriceMap.get(item.internCustomerPriceId);
+      if (specialPrice == null) {
+        throw new ResourceNotFoundException('Preço especial do cliente');
+      }
+      return specialPrice;
+    }
+
+    return null;
+  }
+
+  private resolveItemSpecialPriceSource(
+    item: CreateSaleItemDto,
+  ): SpecialPriceSource {
+    if (item.specialPrice != null) {
+      return SpecialPriceSource.NEGOTIATED;
+    }
+
+    if (item.internCustomerPriceId != null) {
+      return SpecialPriceSource.CUSTOMER_TABLE;
+    }
+
+    return SpecialPriceSource.CATALOG;
   }
 
   private validateSaleFinancials(

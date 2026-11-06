@@ -9,3 +9,9 @@ export enum SaleType {
   SERVICE = 'SERVICO',
   PDV = 'PDV',
 }
+
+export enum SpecialPriceSource {
+  CATALOG = 'CATALOG',
+  CUSTOMER_TABLE = 'CUSTOMER_TABLE',
+  NEGOTIATED = 'NEGOTIATED',
+}

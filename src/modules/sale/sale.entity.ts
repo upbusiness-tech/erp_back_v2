@@ -15,7 +15,11 @@ import { SaleStatus, SaleType } from './sale.enum';
 import { SaleItemEntity } from './submodules/saleItem/saleItem.entity';
 import { SalePaymentEntity } from './submodules/salePayment/salePayment.entity';
 import { SaleServiceEntity } from './submodules/saleService/saleService.entity';
-import type { DiscountInfo, SaleSummary } from './types/sale.types';
+import type {
+  DiscountInfo,
+  IsolatedCustomerSnapshot,
+  SaleSummary,
+} from './types/sale.types';
 
 @Entity({ name: 'sales' })
 @Unique(['companyUid', 'code'])
@@ -34,6 +38,9 @@ export class SaleEntity extends BaseEntity {
 
   @Column({ nullable: true, default: null })
   internCustomerId: number;
+
+  @Column({ type: 'jsonb', nullable: true })
+  isolatedCustomer: IsolatedCustomerSnapshot | null;
 
   @ManyToOne(() => InternCustomerEntity)
   @JoinColumn({ name: 'internCustomerId' })

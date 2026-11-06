@@ -5,6 +5,7 @@ import { ProductEntity } from 'src/modules/product/product.entity';
 import { ProductEspecificationEntity } from 'src/modules/product/submodules/productEspecification/productEspecification.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { SaleEntity } from '../../sale.entity';
+import { SpecialPriceSource } from '../../sale.enum';
 import type { DiscountInfo } from '../../types/sale.types';
 
 @Entity({ name: 'sales_items' })
@@ -33,6 +34,13 @@ export class SaleItemEntity extends BaseEntity {
 
   @Column({ type: 'boolean', default: false })
   isEspecialPrice: boolean;
+
+  @Column({
+    type: 'varchar',
+    enum: SpecialPriceSource,
+    default: SpecialPriceSource.CATALOG,
+  })
+  specialPriceSource: SpecialPriceSource;
 
   @Column({ type: 'jsonb', nullable: true })
   productSnapshot: Partial<ProductEspecificationEntity>;

@@ -15,4 +15,11 @@ export const SaleSetting = {
     defaultActive: true,
     plan: PlanIds.GESTOR,
   },
+  NegotiatedSalePrice: {
+    module: 'Sale',
+    key: 'negotiated_sale_price',
+    description: 'Permitir preço negociado por item na venda',
+    defaultActive: false,
+    plan: PlanIds.GESTOR,
+  },
 };

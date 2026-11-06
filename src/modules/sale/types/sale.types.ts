@@ -1,3 +1,5 @@
+import { InternCustomerType } from 'src/modules/internCustomer/internCustomer.enum';
+
 export interface DiscountInfo {
   value?: number;
   percent?: number;
@@ -14,4 +16,11 @@ export interface SaleSummary {
   total: number;
   paid: number;
   change: number;
+}
+
+export interface IsolatedCustomerSnapshot {
+  name: string;
+  type?: InternCustomerType;
+  address?: string;
+  phoneNumber?: string;
 }

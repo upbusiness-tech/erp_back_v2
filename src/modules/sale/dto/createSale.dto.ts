@@ -13,6 +13,7 @@ import {
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
+import { InternCustomerType } from 'src/modules/internCustomer/internCustomer.enum';
 import { ProductUnitOfMeasure } from 'src/modules/product/product.enum';
 import { SaleType } from '../sale.enum';
 import { PaymentMethod } from '../submodules/salePayment/salePayment.enum';
@@ -51,7 +52,13 @@ export class CreateSaleItemDto {
   unitOfMeasure: ProductUnitOfMeasure;
 
   @IsBoolean()
+  @IsOptional()
   isEspecialPrice: boolean;
+
+  @IsNumber()
+  @IsPositive()
+  @IsOptional()
+  specialPrice?: number;
 
   @IsNumber()
   @IsOptional()
@@ -99,6 +106,24 @@ export class CreateSaleServiceDto {
   discount: DiscountInfoDto;
 }
 
+export class IsolatedCustomerDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsEnum(InternCustomerType)
+  @IsOptional()
+  type?: InternCustomerType;
+
+  @IsString()
+  @IsOptional()
+  address?: string;
+
+  @IsString()
+  @IsOptional()
+  phoneNumber?: string;
+}
+
 export class CreateSaleDto {
   @IsEnum(SaleType)
   type: SaleType;
@@ -106,6 +131,11 @@ export class CreateSaleDto {
   @IsNumber()
   @IsOptional()
   internCustomerId: number;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => IsolatedCustomerDto)
+  isolatedCustomer?: IsolatedCustomerDto;
 
   @IsNumber()
   cashFlowId: number;
