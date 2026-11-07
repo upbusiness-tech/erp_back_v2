@@ -86,6 +86,22 @@ describe('CreateSaleDto', () => {
     await expect(validateDto(payloadWithSpecialPrice)).resolves.toHaveLength(0);
   });
 
+  it('accepts a payment with amount equal to zero', async () => {
+    const payload = buildValidPayload();
+    payload.payments = [{ type: PaymentMethod.CASH, amount: 0 }];
+
+    await expect(validateDto(payload)).resolves.toHaveLength(0);
+  });
+
+  it('rejects a payment with negative amount', async () => {
+    const payload = buildValidPayload();
+    payload.payments = [{ type: PaymentMethod.CASH, amount: -1 }];
+
+    const errors = await validateDto(payload);
+
+    expect(errors.some((error) => error.property === 'payments')).toBe(true);
+  });
+
   it('rejects specialPrice equal to zero or negative', async () => {
     for (const specialPrice of [0, -5]) {
       const payload = buildValidPayload();

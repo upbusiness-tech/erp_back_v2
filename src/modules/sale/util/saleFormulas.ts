@@ -4,7 +4,15 @@ import { SaleEntity } from '../sale.entity';
 import { SaleItemEntity } from '../submodules/saleItem/saleItem.entity';
 import { SaleServiceEntity } from '../submodules/saleService/saleService.entity';
 
-export const round2 = (value: number): number => Math.round(value * 100) / 100;
+export const toCents = (value: number | null | undefined): number =>
+  Math.round((value ?? 0) * 100);
+
+export const fromCents = (value: number): number => value / 100;
+
+export const round2 = (value: number): number => fromCents(toCents(value));
+
+export const hasInsufficientPayment = (paid: number, total: number): boolean =>
+  toCents(paid) < toCents(total);
 
 export const resolveItemUnitPrice = (item: SaleItemEntity): number =>
   item.isEspecialPrice && item.specialPriceSnapshot != null
@@ -65,17 +73,23 @@ export const allocateSaleDiscountShares = (
 };
 
 export const calculateSaleItems = (items: SaleItemEntity[]) => {
-  return items.reduce(
+  const totals = items.reduce(
     (acc, item) => {
       const { gross, discount, net } = calculateItemLine(item);
       return {
-        gross: round2(acc.gross + gross),
-        discounts: round2(acc.discounts + discount),
-        net: round2(acc.net + net),
+        grossCents: acc.grossCents + toCents(gross),
+        discountCents: acc.discountCents + toCents(discount),
+        netCents: acc.netCents + toCents(net),
       };
     },
-    { gross: 0, discounts: 0, net: 0 },
+    { grossCents: 0, discountCents: 0, netCents: 0 },
   );
+
+  return {
+    gross: fromCents(totals.grossCents),
+    discounts: fromCents(totals.discountCents),
+    net: fromCents(totals.netCents),
+  };
 };
 
 export const calculateServiceLine = (service: SaleServiceEntity) => {
@@ -87,23 +101,32 @@ export const calculateServiceLine = (service: SaleServiceEntity) => {
 };
 
 export const calculateSaleServices = (services: SaleServiceEntity[]) => {
-  return services.reduce(
+  const totals = services.reduce(
     (acc, service) => {
       const { gross, discount, net } = calculateServiceLine(service);
       return {
-        gross: round2(acc.gross + gross),
-        discounts: round2(acc.discounts + discount),
-        net: round2(acc.net + net),
+        grossCents: acc.grossCents + toCents(gross),
+        discountCents: acc.discountCents + toCents(discount),
+        netCents: acc.netCents + toCents(net),
       };
     },
-    { gross: 0, discounts: 0, net: 0 },
+    { grossCents: 0, discountCents: 0, netCents: 0 },
   );
+
+  return {
+    gross: fromCents(totals.grossCents),
+    discounts: fromCents(totals.discountCents),
+    net: fromCents(totals.netCents),
+  };
 };
 
 export const calculateSalePayments = (payments: CreateSalePaymentDto[]) => {
-  return payments.reduce((acc, payment) => {
-    return round2(acc + payment.amount);
-  }, 0);
+  const totalCents = payments.reduce(
+    (acc, payment) => acc + toCents(payment.amount),
+    0,
+  );
+
+  return fromCents(totalCents);
 };
 
 export const calculateSaleTotals = (
@@ -115,11 +138,13 @@ export const calculateSaleTotals = (
   const itemsResult = calculateSaleItems(items);
   const servicesResult = calculateSaleServices(services);
 
-  const subtotal = round2(itemsResult.net + servicesResult.net);
+  const subtotalCents = toCents(itemsResult.net) + toCents(servicesResult.net);
   const saleDiscount = round2(sale.discount?.value ?? 0);
-  const total = round2(subtotal - saleDiscount);
+  const totalCents = subtotalCents - toCents(saleDiscount);
+  const total = fromCents(totalCents);
   const paid = calculateSalePayments(payments);
-  const change = round2(paid - total);
+  const change = fromCents(toCents(paid) - totalCents);
+  const subtotal = fromCents(subtotalCents);
 
   const summary: SaleSummary = {
     items: itemsResult.gross,

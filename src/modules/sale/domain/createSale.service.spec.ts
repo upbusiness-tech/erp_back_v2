@@ -193,6 +193,36 @@ describe('CreateSaleService', () => {
     );
   });
 
+  it('should accept payment equal to the per-line rounded total for weighted items', async () => {
+    mockSpec.salePrice = 27;
+    const dto = buildBaseDto();
+    dto.items = [
+      { ...dto.items[0], quantitySold: 1, unitSold: 0.608 },
+      { ...dto.items[0], quantitySold: 1, unitSold: 0.608 },
+    ];
+    // 27 * 0.608 = 16.416 -> 16.42 por linha -> total 32.84
+    dto.payments = [{ type: 'CASH' as any, amount: 32.84 }];
+
+    await expect(
+      service.execute(dto, 'company-1', 'user-1'),
+    ).resolves.toBeDefined();
+  });
+
+  it('should reject a payment based on the unrounded raw sum', async () => {
+    mockSpec.salePrice = 27;
+    const dto = buildBaseDto();
+    dto.items = [
+      { ...dto.items[0], quantitySold: 1, unitSold: 0.608 },
+      { ...dto.items[0], quantitySold: 1, unitSold: 0.608 },
+    ];
+    // soma bruta 32.832 -> 32.83, abaixo do total arredondado por linha (32.84)
+    dto.payments = [{ type: 'CASH' as any, amount: 32.83 }];
+
+    await expect(service.execute(dto, 'company-1', 'user-1')).rejects.toThrow(
+      new HttpException('Valor pago é insuficiente para o total da venda', 400),
+    );
+  });
+
   it('should persist the negotiated price snapshot and profit', async () => {
     mockSpec.costPrice = 20;
     const dto = buildBaseDto();

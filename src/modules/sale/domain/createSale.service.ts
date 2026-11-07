@@ -3,6 +3,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InvalidOperationException } from 'src/exceptions/invalidOperation.exception';
@@ -33,6 +34,7 @@ import {
   calculateItemLine,
   calculateSaleTotals,
   calculateServiceLine,
+  hasInsufficientPayment,
   round2,
 } from '../util/saleFormulas';
 
@@ -40,6 +42,8 @@ const CODE_LENGTH = 6;
 
 @Injectable()
 export class CreateSaleService {
+  private readonly logger = new Logger(CreateSaleService.name);
+
   constructor(
     @InjectRepository(SaleEntity)
     private repo: Repository<SaleEntity>,
@@ -419,7 +423,10 @@ export class CreateSaleService {
       );
     }
 
-    if (totals.paid < totals.total) {
+    if (hasInsufficientPayment(totals.paid, totals.total)) {
+      this.logger.warn(
+        `Pagamento insuficiente: pago=${totals.paid} total=${totals.total}`,
+      );
       throw new BadRequestException(
         'Valor pago é insuficiente para o total da venda',
       );

@@ -5,8 +5,11 @@ import {
   calculateItemAmounts,
   calculateItemLine,
   calculateSaleItems,
+  calculateSalePayments,
   calculateSaleServices,
   calculateSaleTotals,
+  hasInsufficientPayment,
+  toCents,
 } from './saleFormulas';
 
 const makeItem = (overrides: Partial<SaleItemEntity> = {}): SaleItemEntity =>
@@ -217,6 +220,40 @@ describe('saleFormulas', () => {
       expect(result.change).toBe(32);
       expect(result.summary.total).toBe(88);
       expect(result.summary.change).toBe(32);
+    });
+
+    it('should round each weighted line to cents before summing', () => {
+      const items = [
+        makeItem({ salePriceSnapshot: 27, unitSold: 0.608 }),
+        makeItem({ salePriceSnapshot: 26, unitSold: 0.428 }),
+        makeItem({ salePriceSnapshot: 38, unitSold: 0.827 }),
+      ];
+      const payments = [{ type: 'CASH' as any, amount: 58.98 }];
+
+      const result = calculateSaleTotals(
+        { discount: null },
+        items,
+        [],
+        payments,
+      );
+
+      // 16.416 + 11.128 + 31.426 -> 16.42 + 11.13 + 31.43
+      expect(result.items.gross).toBe(58.98);
+      expect(result.total).toBe(58.98);
+      expect(result.paid).toBe(58.98);
+      expect(result.change).toBe(0);
+    });
+
+    it('should compare payments and totals in cents', () => {
+      expect(
+        calculateSalePayments([
+          { type: 'CASH' as any, amount: 0.1 },
+          { type: 'CASH' as any, amount: 0.2 },
+        ]),
+      ).toBe(0.3);
+      expect(hasInsufficientPayment(58.97, 58.98)).toBe(true);
+      expect(hasInsufficientPayment(58.98, 58.98)).toBe(false);
+      expect(toCents(356.785)).toBe(35679);
     });
 
     it('should handle sale with no discounts', () => {

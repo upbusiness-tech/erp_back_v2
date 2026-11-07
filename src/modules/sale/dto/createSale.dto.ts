@@ -83,7 +83,7 @@ export class CreateSalePaymentDto {
   type: PaymentMethod;
 
   @IsNumber()
-  @IsPositive()
+  @Min(0)
   amount: number;
 }
 
