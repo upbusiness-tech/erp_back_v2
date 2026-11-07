@@ -61,8 +61,7 @@ export class CloseCashFlowService {
 
       return await this.repo.update(cashFlowOpened.id, {
         isClosed: true,
-        // FIXME: a data aqui precisa ser gerada pelo próprio postgre, se eu coloco assim ele gera uma data com horário inferior ou superior ao esperado
-        closedAt: new Date(),
+        closedAt: () => 'CURRENT_TIMESTAMP',
         closedByUserUid: employeeUserUid,
         closingBalance: dto.closingBalance,
         informedValues: dto.informedValues,

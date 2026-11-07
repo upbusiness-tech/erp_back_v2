@@ -42,7 +42,7 @@ export class CancelSaleService {
         // 1. marca a venda como cancelada, registrando quando e quem cancelou
         await entityManager.update(SaleEntity, saleToCancel.id, {
           status: SaleStatus.CANCELED,
-          canceledAt: new Date(),
+          canceledAt: () => 'CURRENT_TIMESTAMP',
           canceledByUserUid: employee.uid,
         });
 
@@ -65,7 +65,8 @@ export class CancelSaleService {
             .createQueryBuilder()
             .update(ProductEspecificationEntity)
             .set({
-              stockQuantity: () => `stockQuantity + (${item.quantitySold} * ${item.unitSold})`,
+              stockQuantity: () =>
+                `stockQuantity + (${item.quantitySold} * ${item.unitSold})`,
             })
             .where('id = :id', { id: item.productEspecificationId })
             .execute();

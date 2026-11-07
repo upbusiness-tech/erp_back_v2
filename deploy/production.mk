@@ -4,7 +4,7 @@ SERVICE := erp-api
 REGION := southamerica-east1
 REGISTRY := $(REGION)-docker.pkg.dev/$(PROJECT_ID)/$(SERVICE)
 
-MIN_INSTANCES := 1
+MIN_INSTANCES := 0
 MAX_INSTANCES := 5
 TIMEOUT := 300s
 MEMORY := 512Mi

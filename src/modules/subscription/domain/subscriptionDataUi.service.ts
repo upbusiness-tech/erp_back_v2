@@ -107,7 +107,7 @@ export class SubscriptionDataUiService extends TypeOrmCrudService<SubscriptionEn
     });
 
     await this.repo.update(subscription.id, {
-      paidAt: new Date(),
+      paidAt: () => 'CURRENT_TIMESTAMP',
       status: SubscriptionStatus.PAID,
     });
   }
