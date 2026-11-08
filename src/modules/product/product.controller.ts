@@ -37,6 +37,7 @@ import { CreateProductDto } from './dto/createProduct.dto';
 import { UpdateProductDto } from './dto/updateProduct.dto';
 import { ProductEntity } from './product.entity';
 import { ViewProductPictureGalleryService } from './domain/viewProductPictureGallery.service';
+import { ViewProductStockOverviewService } from './domain/viewProductStockOverview.service';
 
 @Crud({
   model: {
@@ -93,6 +94,7 @@ export class ProductController implements CrudController<ProductEntity> {
     public viewProductExpandedDetailsService: ViewProductExpandedDetailsService,
     public readonly viewTopSellingProductsService: ViewTopSellingProductsService,
     public readonly viewProductPictureGalleryService: ViewProductPictureGalleryService,
+    public readonly viewProductStockOverviewService: ViewProductStockOverviewService,
     public readonly createProductService: CreateProductService,
     public readonly updateProductService: UpdateProductService,
   ) {}
@@ -145,5 +147,11 @@ export class ProductController implements CrudController<ProductEntity> {
   @UseInterceptors(CrudRequestInterceptor)
   async getGallery(@ParsedRequest() req: CrudRequest) {
     return await this.viewProductPictureGalleryService.getMany(req);
+  }
+
+  @Get('stock-overview')
+  @UseInterceptors(CrudRequestInterceptor)
+  async getStockPrices(@ParsedRequest() req: CrudRequest) {
+    return await this.viewProductStockOverviewService.getMany(req);
   }
 }

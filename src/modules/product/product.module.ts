@@ -19,6 +19,8 @@ import { InternCustomerPriceEntity } from '../internCustomer/submodules/internCu
 import { ProductSupplierModule } from './submodules/productSupplier/productSupplier.module';
 import { ViewProductPictureGalleryEntity } from 'src/views/product/viewProductPictureGallery.entity';
 import { ViewProductPictureGalleryService } from './domain/viewProductPictureGallery.service';
+import { ViewProductStockOverviewEntity } from 'src/views/product/viewProductStockOverview.entity';
+import { ViewProductStockOverviewService } from './domain/viewProductStockOverview.service';
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { ViewProductPictureGalleryService } from './domain/viewProductPictureGal
       ProductEspecificationEntity,
       InternCustomerPriceEntity,
       ViewProductPictureGalleryEntity,
+      ViewProductStockOverviewEntity,
     ]),
     ProductCategoryModule,
     ProductEspecificationModule,
@@ -45,6 +48,7 @@ import { ViewProductPictureGalleryService } from './domain/viewProductPictureGal
     ViewProductExpandedDetailsService,
     ViewTopSellingProductsService,
     ViewProductPictureGalleryService,
+    ViewProductStockOverviewService,
   ],
 })
 export class ProductModule {}

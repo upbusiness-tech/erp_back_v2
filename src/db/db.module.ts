@@ -13,7 +13,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-        migrations: [__dirname + '/migrations/*.ts'],
+        migrations: [__dirname + '/migrations/*{.ts,.js}'],
         synchronize: process.env.NODE_ENV !== 'production',
         ...(process.env.DB_SSL === 'true' && {
           ssl: { rejectUnauthorized: false },
