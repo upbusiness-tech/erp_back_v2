@@ -27,13 +27,8 @@ export class CreateProductService {
   ) {
     // eslint-disable-next-line no-useless-catch
     try {
-      const companyFound = await this.companyService.findOne({
-        where: {
-          uid: companyUid,
-        },
-      });
-
-      if (!companyFound) throw new ResourceNotFoundException('Company');
+      const companyFound =
+        await this.companyService.findActiveCompany(companyUid);
 
       const user = await this.userService.findOne({
         where: {
