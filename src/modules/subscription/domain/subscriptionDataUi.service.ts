@@ -110,6 +110,15 @@ export class SubscriptionDataUiService extends TypeOrmCrudService<SubscriptionEn
       paidAt: () => 'CURRENT_TIMESTAMP',
       status: SubscriptionStatus.PAID,
     });
+
+    await this.companyRepo.update(
+      {
+        uid: subscription.companyUid,
+      },
+      {
+        status: CompanyStatus.ACTIVE,
+      },
+    );
   }
 
   async interceptPayment(webhookPayload: WebHookDefaultFields) {
