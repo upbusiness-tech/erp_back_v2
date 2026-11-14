@@ -3,6 +3,7 @@ import { ViewColumn, ViewEntity } from 'typeorm';
 
 @ViewEntity({
   name: 'view_product_stock_overview',
+  synchronize: false,
   expression: `
   select
     c.uid as "companyUid",

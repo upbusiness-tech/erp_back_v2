@@ -21,6 +21,7 @@ import { AllExceptionsFilter } from './exceptions/handler/allExceptions.handler'
 import { HealthModule } from './health/health.module';
 import { SchedulersModule } from './modules/schedulers/schedulers.module';
 import { validateEnv } from './config/env.validation';
+import { StatisticModule } from './modules/statistic/statistic.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { validateEnv } from './config/env.validation';
     InternCustomerModule,
     HealthModule,
     SchedulersModule,
+    StatisticModule,
   ],
   controllers: [AppController],
   providers: [

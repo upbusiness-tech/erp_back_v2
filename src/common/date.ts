@@ -35,3 +35,11 @@ export const getNextDueDate = (payday: number, from: Date = new Date()) => {
 
 export const getReferenceMonthFromDate = (date: Date) =>
   format(date, 'yyyy-MM');
+
+function pad(n: number): string {
+  return String(n).padStart(2, '0');
+}
+
+export function toTimestampUTC(date: Date): string {
+  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())} ${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())}`;
+}
