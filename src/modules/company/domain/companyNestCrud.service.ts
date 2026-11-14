@@ -22,7 +22,9 @@ export class CompanyNestCrudService extends TypeOrmCrudService<CompanyEntity> {
     }
 
     if (company.status !== CompanyStatus.ACTIVE) {
-      throw new BadRequestException('Empresa não está com status ativo');
+      throw new BadRequestException(
+        'Empresa consta como inativa. Consultar suporte.',
+      );
     }
 
     return company;

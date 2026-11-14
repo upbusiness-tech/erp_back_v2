@@ -1,7 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { SchedulersService } from './schedulers.service';
+import { CloudSchedulerGuard } from 'src/auth/guards/cloudScheduler.guard';
 
 @Controller('schedulers')
+@UseGuards(CloudSchedulerGuard)
 export class SchedulersController {
   constructor(private readonly schedulersService: SchedulersService) {}
 

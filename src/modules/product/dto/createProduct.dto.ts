@@ -1,4 +1,6 @@
+import { Type } from 'class-transformer';
 import {
+  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsEnum,
@@ -11,7 +13,6 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { ProductUnitOfMeasure } from '../product.enum';
-import { Type } from 'class-transformer';
 import { CreateProductFiscalClassificationDto } from '../submodules/productFiscalClassification/dto/createProductFiscalClassification.dto';
 
 export class CreateProductDto {
@@ -37,6 +38,9 @@ export class CreateProductDto {
   productCategoryId: number;
 
   @IsArray()
+  @ArrayMinSize(1, {
+    message: 'Necessário pelo menos uma variação para criar o produto',
+  })
   @ValidateNested({ each: true })
   @Type(() => ProductVariant)
   variants: ProductVariant[];
