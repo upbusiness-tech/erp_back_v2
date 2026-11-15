@@ -139,6 +139,8 @@ describe('UpdateProductService', () => {
             costPrice: 5,
             isStockControlled: true,
             stockQuantity: 8,
+            maxStock: 100,
+            minStock: 5,
           },
         ],
       },
@@ -159,7 +161,12 @@ describe('UpdateProductService', () => {
     expect(transactionManager.update).toHaveBeenCalledWith(
       ProductEspecificationEntity,
       { id: 1, productId: 1 },
-      expect.objectContaining({ salePrice: 20, stockQuantity: 8 }),
+      expect.objectContaining({
+        salePrice: 20,
+        stockQuantity: 8,
+        maxStock: 100,
+        minStock: 5,
+      }),
     );
 
     expect(transactionManager.save).toHaveBeenCalledWith(
