@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { StatisticDateRage } from './statistic.types';
+import { StatisticDateRange } from './statistic.types';
 
 const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 // const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -7,7 +7,7 @@ const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 export function normalizeStatisticDateRange(
   from: unknown,
   to: unknown,
-): StatisticDateRage {
+): StatisticDateRange {
   if (
     typeof from !== 'string' ||
     typeof to !== 'string' ||

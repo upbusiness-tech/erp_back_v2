@@ -5,6 +5,7 @@ import { EmployeeAuthGuard } from 'src/auth/guards/employeeAuth.guard';
 import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 import { StatisticStockService } from './statisticStock.service';
 import { QueryStatisticPeriodDto } from '../common/dto/queryStatisticPeriod.dto';
+import { QueryStatisticLimitDto } from '../common/dto/queryStatisticLimit.dto';
 
 @Controller('statistic/stock')
 @UseGuards(EmployeeAuthGuard, PermissionsGuard)
@@ -25,7 +26,7 @@ export class StatisticStockController {
   @Get('health-overview')
   async getHealth(
     @CurrentCompany() company: CompanyTokenPayload,
-    @Query() query: QueryStatisticPeriodDto,
+    @Query() query: QueryStatisticLimitDto,
   ) {
     return await this.statisticStockService.getHealthOverview(
       company.companyUid,

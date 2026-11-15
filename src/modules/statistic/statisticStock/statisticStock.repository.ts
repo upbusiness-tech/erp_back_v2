@@ -60,7 +60,11 @@ export class StatisticStockRepository {
         `SUM(CASE WHEN ptr."type" = :plus THEN pe."costPrice" * ptr."value" END)`,
         'productEntryBalance',
       )
-      .addSelect(`SUM(ptr."value")`, 'productMoviments')
+      .addSelect(
+        `SUM(CASE WHEN ptr."type" = :plus THEN ptr."value" ELSE 0 END) +
+         SUM(CASE WHEN ptr."type" = :subtraction AND s."status" != :canceled THEN ptr."value" ELSE 0 END)`,
+        'productMoviments',
+      )
       .addSelect(
         `SUM(CASE WHEN ptr."type" = :plus THEN ptr."value" ELSE 0 END) -
          SUM(CASE WHEN ptr."type" = :subtraction AND s."status" != :canceled THEN ptr."value" ELSE 0 END)`,
@@ -154,6 +158,9 @@ export class StatisticStockRepository {
       .where('s."companyUid" = :companyUid', { companyUid: params.companyUid })
       .andWhere('s."createdAt" >= :fromDate', { fromDate: params.fromDate })
       .andWhere('s."createdAt" < :toDate', { toDate: params.toDate })
+      .andWhere('s."status" != :canceledStatus', {
+        canceledStatus: SaleStatus.CANCELED,
+      })
       .groupBy('p."name"')
       .addGroupBy('pe."size"')
       .addGroupBy('pe."color"')
@@ -195,6 +202,9 @@ export class StatisticStockRepository {
       .where('s."companyUid" = :companyUid', { companyUid: params.companyUid })
       .andWhere('s."createdAt" >= :fromDate', { fromDate: params.fromDate })
       .andWhere('s."createdAt" < :toDate', { toDate: params.toDate })
+      .andWhere('s."status" != :canceledStatus', {
+        canceledStatus: SaleStatus.CANCELED,
+      })
       .groupBy('p."name"')
       .addGroupBy('pe."size"')
       .addGroupBy('pe."color"')
@@ -214,8 +224,10 @@ export class StatisticStockRepository {
       .createQueryBuilder('p')
       .select('pc.id', 'id')
       .addSelect('pc.name', 'name')
-      .addSelect('count(p.id)', 'amountCategory')
+      .addSelect('count(distinct p.id)', 'amountCategory')
+      .addSelect('sum(pe."stockQuantity")', 'stockQuantity')
       .innerJoin('product_categories', 'pc', 'pc.id = p."productCategoryId"')
+      .innerJoin('product_especifications', 'pe', 'pe."productId" = p.id')
       .where('p."companyUid" = :companyUid', { companyUid })
       .groupBy('pc.id')
       .addGroupBy('pc.name')
@@ -271,9 +283,11 @@ export class StatisticStockRepository {
       .createQueryBuilder('p')
       .select('p."name"', 'name')
       .addSelect('sum(pe."stockQuantity")', 'stockQuantity')
+      .addSelect('p."unitOfMeasure"', 'unitOfMeasure')
       .innerJoin('product_especifications', 'pe', 'pe."productId" = p.id')
       .where('p."companyUid" = :companyUid', { companyUid })
       .groupBy('p."name"')
+      .addGroupBy('p."unitOfMeasure"')
       .orderBy('"stockQuantity"', params.order);
 
     if (params.limit) {

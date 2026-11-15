@@ -36,6 +36,7 @@ export interface StatisticStockDistributionByCategoryRow {
   id: number;
   name: string;
   amountCategory: string;
+  stockQuantity: string;
 }
 
 export interface StatisticStockStatusByEspecificationRow {
@@ -50,4 +51,70 @@ export interface StatisticStockStatusByEspecificationRow {
 export interface StatisticStockStatusRow {
   name: string;
   stockQuantity: string | null;
+  unitOfMeasure: string;
+}
+
+// ---- Response shapes (clean, numeric) ----
+
+export interface StatisticStockInOutResponse {
+  entries: number;
+  exits: number;
+  movedUnits: number;
+  balance: number;
+  entriesSubtitleValue: number;
+  exitsSubtitleValue: number;
+}
+
+export interface StatisticStockRankingResponse {
+  name: string;
+  size: string | null;
+  color: string | null;
+  brand: string | null;
+  unitOfMeasure: string;
+  quantitySold: number;
+  salesAmount: number;
+  salesProfitAmount: number;
+}
+
+export interface StatisticStockHistoryOverviewResponse {
+  inOut: StatisticStockInOutResponse;
+  topSelling: StatisticStockRankingResponse[];
+  untopSelling: StatisticStockRankingResponse[];
+  revenueProducts: StatisticStockRankingResponse[];
+}
+
+export interface StatisticStockAlertsResponse {
+  underMinStock: number;
+  overMaxStock: number;
+  soldOutTotal: number;
+  noSupplierInformed: number;
+}
+
+export interface StatisticStockCategoryDistributionResponse {
+  id: number;
+  name: string;
+  amountCategory: number;
+  stockQuantity: number;
+}
+
+export interface StatisticStockStatusResponse {
+  name: string;
+  stockQuantity: number;
+  unitOfMeasure: string;
+}
+
+export interface StatisticStockStatusByEspecificationResponse {
+  name: string;
+  size: string | null;
+  color: string | null;
+  brand: string | null;
+  unitOfMeasure: string;
+  stockQuantity: number;
+}
+
+export interface StatisticStockHealthOverviewResponse {
+  alerts: StatisticStockAlertsResponse;
+  categoryDistribution: StatisticStockCategoryDistributionResponse[];
+  highestStock: StatisticStockStatusResponse[];
+  highestStockVariations: StatisticStockStatusByEspecificationResponse[];
 }

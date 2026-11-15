@@ -1,4 +1,4 @@
-export type StatisticDateRage = {
+export type StatisticDateRange = {
   from: string;
   to: string;
   fromDate: Date;
