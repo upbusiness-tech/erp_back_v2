@@ -23,6 +23,11 @@ CrudConfigService.load({
         query: (field, param) =>
           `unaccent(LOWER(${field})) ILIKE '%' || unaccent(LOWER(:${param})) || '%'`,
       },
+      // busca dentro de jsonb: o campo enviado é a coluna jsonb (ex: isolatedCustomer em sale.entity)
+      $contJsonNameUL: {
+        query: (field, param) =>
+          `unaccent(LOWER(${field}->>'name')) ILIKE '%' || unaccent(LOWER(:${param})) || '%'`,
+      },
     },
   },
 });

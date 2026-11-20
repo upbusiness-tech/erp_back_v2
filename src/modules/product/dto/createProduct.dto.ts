@@ -10,6 +10,7 @@ import {
   IsPositive,
   IsString,
   IsUrl,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import { ProductUnitOfMeasure } from '../product.enum';
@@ -56,6 +57,16 @@ export class ProductVariant {
   @IsPositive()
   @IsOptional()
   id?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  maxStock: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  minStock: number;
 
   @IsString()
   @IsOptional()

@@ -219,6 +219,8 @@ export class UpdateProductService {
 
       const updateData = Object.fromEntries(
         Object.entries({
+          maxStock: variant.maxStock,
+          minStock: variant.minStock,
           code: variant.code,
           salePrice: variant.salePrice,
           costPrice: variant.costPrice,
@@ -302,6 +304,8 @@ export class UpdateProductService {
           ProductEspecificationEntity,
           { id: variant.id, productId },
           {
+            maxStock: variant.maxStock,
+            minStock: variant.minStock,
             code: variant.code,
             salePrice: variant.salePrice,
             costPrice: variant.costPrice,

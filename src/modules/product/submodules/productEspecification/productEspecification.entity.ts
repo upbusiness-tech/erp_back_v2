@@ -7,6 +7,12 @@ import { ProductSupplierEntity } from '../productSupplier/productSupplier.entity
 
 @Entity({ name: 'product_especifications' })
 export class ProductEspecificationEntity extends BaseEntity {
+  @Column({ type: 'decimal', transformer: numericTransformer, nullable: true })
+  maxStock: number;
+
+  @Column({ type: 'decimal', transformer: numericTransformer, nullable: true })
+  minStock: number;
+
   @Column()
   code: string;
 
